@@ -2,13 +2,17 @@
 
 Infinite reverse scroll directive for Angular 5
 
-## Usage
+## Installation
 
-Run `npm run build:library` to build the library. The build artifacts will be stored in the `list-dist/` directory.
+Run `npm install ngx-infinite-scroller --save` to install the library.
+
+## Usage
 
 Include `NgxInfiniteScrollerModule` in your module
 
 ```typescript
+import { NgxInfiniteScrollerModule } from 'ngx-infinite-scroller';
+
 @NgModule({
   declarations: [
   ],
@@ -80,3 +84,5 @@ export class AppComponent implements OnInit {
 ## Development environment
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+
+Run `npm run build:library` to build the library. The build artifacts will be stored in the `list-dist/` directory.

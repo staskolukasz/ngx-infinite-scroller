@@ -2,13 +2,17 @@
 
 Infinite reverse scroll directive for Angular 5
 
-## Usage
+## Installation
 
 Run `npm install ngx-infinite-scroller --save` to install the library.
+
+## Usage
 
 Include `NgxInfiniteScrollerModule` in your module
 
 ```typescript
+import { NgxInfiniteScrollerModule } from 'ngx-infinite-scroller';
+
 @NgModule({
   declarations: [
   ],
