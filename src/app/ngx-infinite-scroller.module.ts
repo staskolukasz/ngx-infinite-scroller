@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { NgxInfiniteScrollerDirective } from './ngx-infinite-scroller.directive';
@@ -9,7 +8,7 @@ import { NgxInfiniteScrollerDirective } from './ngx-infinite-scroller.directive'
     NgxInfiniteScrollerDirective
   ],
   imports: [
-    CommonModule
+    BrowserModule
   ],
   exports: [
     NgxInfiniteScrollerDirective
