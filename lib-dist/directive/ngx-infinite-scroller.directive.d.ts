@@ -9,7 +9,7 @@ import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/skipWhile';
 import 'rxjs/add/operator/debounceTime';
-export declare class NgxInfiniteScrollDirective implements AfterViewInit, OnInit, OnDestroy {
+export declare class NgxInfiniteScrollerDirective implements AfterViewInit, OnInit, OnDestroy {
     private el;
     private renderer;
     private zone;

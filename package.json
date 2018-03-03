@@ -1,9 +1,9 @@
 {
-  "name": "ngx-infinite-scroll",
+  "name": "ngx-infinite-scroller",
   "version": "1.0.0",
   "description": "Infinite reverse scroll directive for Angular 5",
-  "main": "./lib-dist/ngx-infinite-scroll.js",
-  "types": "./lib-dist/ngx-infinite-scroll.d.ts",
+  "main": "./lib-dist/ngx-infinite-scroller.js",
+  "types": "./lib-dist/ngx-infinite-scroller.d.ts",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

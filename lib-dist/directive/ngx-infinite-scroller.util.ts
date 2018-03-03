@@ -1,12 +1,12 @@
 import { ScrollPosition } from './model/scroll-position.model';
 
-export class ReverseScrollUtil {
+export class NgxInfiniteScrollerUtil {
   public static wasScrolledDown(prevPos: ScrollPosition, currentPos: ScrollPosition): boolean {
     return prevPos.scrollTop < currentPos.scrollTop;
   }
 
   public static wasScrolledUp(prevPos: ScrollPosition, currentPos: ScrollPosition): boolean {
-    return !ReverseScrollUtil.wasScrolledDown(prevPos, currentPos);
+    return !NgxInfiniteScrollerUtil.wasScrolledDown(prevPos, currentPos);
   }
 
   public static isScrollDownEnough(pos: ScrollPosition, scrollPositionTrigger: number): boolean {

@@ -11,10 +11,10 @@ import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/skipWhile';
 import 'rxjs/add/operator/debounceTime';
-import { ReverseScrollUtil } from './ngx-infinite-scroll.util';
+import { NgxInfiniteScrollerUtil } from './ngx-infinite-scroller.util';
 import { initialScrollPosition } from './model/scroll-position.model';
-var NgxInfiniteScrollDirective = /** @class */ (function () {
-    function NgxInfiniteScrollDirective(el, renderer, zone) {
+var NgxInfiniteScrollerDirective = /** @class */ (function () {
+    function NgxInfiniteScrollerDirective(el, renderer, zone) {
         this.el = el;
         this.renderer = renderer;
         this.zone = zone;
@@ -23,7 +23,7 @@ var NgxInfiniteScrollDirective = /** @class */ (function () {
         this.scrollUpPercentilePositionTrigger = 5;
         this.onScrollUp = new EventEmitter();
     }
-    Object.defineProperty(NgxInfiniteScrollDirective.prototype, "scrollPositionChanged", {
+    Object.defineProperty(NgxInfiniteScrollerDirective.prototype, "scrollPositionChanged", {
         get: function () {
             var _this = this;
             if (this.scrollChanged) {
@@ -43,38 +43,38 @@ var NgxInfiniteScrollDirective = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NgxInfiniteScrollDirective.prototype, "scrollDownChanged", {
+    Object.defineProperty(NgxInfiniteScrollerDirective.prototype, "scrollDownChanged", {
         get: function () {
             return this.scrollPositionChanged
                 .filter(function (scrollPositions) {
-                return ReverseScrollUtil.wasScrolledDown(scrollPositions[0], scrollPositions[1]);
+                return NgxInfiniteScrollerUtil.wasScrolledDown(scrollPositions[0], scrollPositions[1]);
             });
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NgxInfiniteScrollDirective.prototype, "scrollUpChanged", {
+    Object.defineProperty(NgxInfiniteScrollerDirective.prototype, "scrollUpChanged", {
         get: function () {
             return this.scrollPositionChanged
                 .filter(function (scrollPositions) {
-                return ReverseScrollUtil.wasScrolledUp(scrollPositions[0], scrollPositions[1]);
+                return NgxInfiniteScrollerUtil.wasScrolledUp(scrollPositions[0], scrollPositions[1]);
             });
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NgxInfiniteScrollDirective.prototype, "scrollRequestZoneEntered", {
+    Object.defineProperty(NgxInfiniteScrollerDirective.prototype, "scrollRequestZoneEntered", {
         get: function () {
             var _this = this;
             return this.scrollUpChanged
                 .filter(function (scrollPositions) {
-                return ReverseScrollUtil.isScrollUpEnough(scrollPositions[0], _this.scrollUpPercentilePositionTrigger);
+                return NgxInfiniteScrollerUtil.isScrollUpEnough(scrollPositions[0], _this.scrollUpPercentilePositionTrigger);
             });
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NgxInfiniteScrollDirective.prototype, "requestDispatcher", {
+    Object.defineProperty(NgxInfiniteScrollerDirective.prototype, "requestDispatcher", {
         get: function () {
             var _this = this;
             return this.scrollRequestZoneEntered
@@ -87,7 +87,7 @@ var NgxInfiniteScrollDirective = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    NgxInfiniteScrollDirective.prototype.ngOnInit = function () {
+    NgxInfiniteScrollerDirective.prototype.ngOnInit = function () {
         this.domMutationEmitter = new Subject();
         this.initMode = true;
         this.scrollStreamActive = false;
@@ -96,21 +96,21 @@ var NgxInfiniteScrollDirective = /** @class */ (function () {
         this.registerInitialScrollPostionHandler();
         this.registerRequestScrollPositionHandler();
     };
-    NgxInfiniteScrollDirective.prototype.ngAfterViewInit = function () {
+    NgxInfiniteScrollerDirective.prototype.ngAfterViewInit = function () {
         this.registerRequestDispatcher();
     };
-    NgxInfiniteScrollDirective.prototype.ngOnDestroy = function () {
+    NgxInfiniteScrollerDirective.prototype.ngOnDestroy = function () {
         this.domMutationObserver.disconnect();
     };
-    NgxInfiniteScrollDirective.prototype.scrollTo = function (scrollTop) {
+    NgxInfiniteScrollerDirective.prototype.scrollTo = function (scrollTop) {
         this.scrollStreamActive = false;
         this.renderer.setProperty(this.el.nativeElement, 'scrollTop', scrollTop || this.el.nativeElement.scrollHeight);
         this.scrollStreamActive = true;
     };
-    NgxInfiniteScrollDirective.prototype.registerScrollEventHandler = function () {
+    NgxInfiniteScrollerDirective.prototype.registerScrollEventHandler = function () {
         this.scrollChanged = Observable.fromEvent(this.el.nativeElement, 'scroll');
     };
-    NgxInfiniteScrollDirective.prototype.registerMutationObserver = function () {
+    NgxInfiniteScrollerDirective.prototype.registerMutationObserver = function () {
         var _this = this;
         this.domMutationObserver = new MutationObserver(function (mutations) {
             _this.domMutationEmitter.next(mutations);
@@ -118,7 +118,7 @@ var NgxInfiniteScrollDirective = /** @class */ (function () {
         var config = { attributes: true, childList: true, characterData: true };
         this.domMutationObserver.observe(this.el.nativeElement, config);
     };
-    NgxInfiniteScrollDirective.prototype.registerInitialScrollPostionHandler = function () {
+    NgxInfiniteScrollerDirective.prototype.registerInitialScrollPostionHandler = function () {
         var _this = this;
         this.domMutationEmitter
             .takeWhile(function () { return _this.initMode; })
@@ -128,7 +128,7 @@ var NgxInfiniteScrollDirective = /** @class */ (function () {
             _this.initMode = false;
         });
     };
-    NgxInfiniteScrollDirective.prototype.registerRequestScrollPositionHandler = function () {
+    NgxInfiniteScrollerDirective.prototype.registerRequestScrollPositionHandler = function () {
         var _this = this;
         Observable
             .zip(this.requestDispatcher, this.domMutationEmitter)
@@ -140,30 +140,30 @@ var NgxInfiniteScrollDirective = /** @class */ (function () {
             _this.scrollTo(newScrollPosition);
         });
     };
-    NgxInfiniteScrollDirective.prototype.registerRequestDispatcher = function () {
+    NgxInfiniteScrollerDirective.prototype.registerRequestDispatcher = function () {
         var _this = this;
         this.requestDispatcher.subscribe(function () {
             _this.onScrollUp.next();
         });
     };
-    NgxInfiniteScrollDirective.decorators = [
+    NgxInfiniteScrollerDirective.decorators = [
         { type: Directive, args: [{
-                    selector: '[ngxInfiniteScroll]'
+                    selector: '[ngxInfiniteScroller]'
                 },] },
     ];
     /** @nocollapse */
-    NgxInfiniteScrollDirective.ctorParameters = function () { return [
+    NgxInfiniteScrollerDirective.ctorParameters = function () { return [
         { type: ElementRef, },
         { type: Renderer2, },
         { type: NgZone, },
     ]; };
-    NgxInfiniteScrollDirective.propDecorators = {
+    NgxInfiniteScrollerDirective.propDecorators = {
         'scrollbarAnimationInterval': [{ type: Input },],
         'scrollDebounceTimeAfterDOMMutation': [{ type: Input },],
         'scrollUpPercentilePositionTrigger': [{ type: Input },],
         'onScrollUp': [{ type: Output },],
     };
-    return NgxInfiniteScrollDirective;
+    return NgxInfiniteScrollerDirective;
 }());
-export { NgxInfiniteScrollDirective };
-//# sourceMappingURL=ngx-infinite-scroll.directive.js.map
+export { NgxInfiniteScrollerDirective };
+//# sourceMappingURL=ngx-infinite-scroller.directive.js.map

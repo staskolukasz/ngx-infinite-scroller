@@ -26,15 +26,15 @@ import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/skipWhile';
 import 'rxjs/add/operator/debounceTime';
 
-import { ReverseScrollUtil } from './ngx-infinite-scroll.util';
+import { NgxInfiniteScrollerUtil } from './ngx-infinite-scroller.util';
 
 import { ScrollPosition } from './model/scroll-position.model';
 import { initialScrollPosition } from './model/scroll-position.model';
 
 @Directive({
-  selector: '[ngxInfiniteScroll]'
+  selector: '[ngxInfiniteScroller]'
 })
-export class NgxInfiniteScrollDirective implements AfterViewInit, OnInit, OnDestroy {
+export class NgxInfiniteScrollerDirective implements AfterViewInit, OnInit, OnDestroy {
 
   @Input()
   public scrollbarAnimationInterval = 100;
@@ -69,7 +69,7 @@ export class NgxInfiniteScrollDirective implements AfterViewInit, OnInit, OnDest
   private get scrollDownChanged(): Observable<ScrollPosition[]> {
     return this.scrollPositionChanged
       .filter((scrollPositions: ScrollPosition[]) => {
-        return ReverseScrollUtil.wasScrolledDown(
+        return NgxInfiniteScrollerUtil.wasScrolledDown(
           scrollPositions[0],
           scrollPositions[1]
         );
@@ -79,7 +79,7 @@ export class NgxInfiniteScrollDirective implements AfterViewInit, OnInit, OnDest
   private get scrollUpChanged(): Observable<ScrollPosition[]> {
     return this.scrollPositionChanged
       .filter((scrollPositions: ScrollPosition[]) => {
-        return ReverseScrollUtil.wasScrolledUp(
+        return NgxInfiniteScrollerUtil.wasScrolledUp(
           scrollPositions[0],
           scrollPositions[1]
         );
@@ -89,7 +89,7 @@ export class NgxInfiniteScrollDirective implements AfterViewInit, OnInit, OnDest
   private get scrollRequestZoneEntered(): Observable<ScrollPosition[]> {
     return this.scrollUpChanged
       .filter((scrollPositions: ScrollPosition[]) => {
-        return ReverseScrollUtil.isScrollUpEnough(
+        return NgxInfiniteScrollerUtil.isScrollUpEnough(
           scrollPositions[0],
           this.scrollUpPercentilePositionTrigger
         );

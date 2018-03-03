@@ -2,19 +2,19 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { NgxInfiniteScrollDirective } from './ngx-infinite-scroll.directive';
+import { NgxInfiniteScrollerDirective } from './ngx-infinite-scroller.directive';
 
 @NgModule({
   declarations: [
-    NgxInfiniteScrollDirective
+    NgxInfiniteScrollerDirective
   ],
   imports: [
     CommonModule
   ],
   exports: [
-    NgxInfiniteScrollDirective
+    NgxInfiniteScrollerDirective
   ],
   providers: [],
   bootstrap: []
 })
-export class NgxInfiniteScrollModule { }
+export class NgxInfiniteScrollerModule { }

@@ -1,4 +1,4 @@
-# ngx-infinite-scroll
+# ngx-infinite-scroller
 
 Infinite reverse scroll directive for Angular 5
 
@@ -6,14 +6,14 @@ Infinite reverse scroll directive for Angular 5
 
 Run `npm run build:library` to build the library. The build artifacts will be stored in the `list-dist/` directory.
 
-Include `NgxInfiniteScrollModule` in your module
+Include `NgxInfiniteScrollerModule` in your module
 
 ```typescript
 @NgModule({
   declarations: [
   ],
   imports: [
-    NgxInfiniteScrollModule,
+    NgxInfiniteScrollerModule,
   ],
   providers: [],
   bootstrap: [
@@ -21,11 +21,11 @@ Include `NgxInfiniteScrollModule` in your module
 })
 ```
 
-Include `ngxInfiniteScroll` directive in your `*.component.html` file
+Include `ngxInfiniteScroller` directive in your `*.component.html` file
 
 ```html
 <ul id="scroller"
-    ngxInfiniteScroll
+    ngxInfiniteScroller
     (onScrollUp)="onScrollUp()">
   <li *ngFor="let item of news">
     {{item.title}}

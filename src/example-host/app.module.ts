@@ -4,8 +4,8 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 
-import { NgxInfiniteScrollModule } from './../app/ngx-infinite-scroll';
-import { NgxInfiniteScrollDirective } from './../app/directive/ngx-infinite-scroll.directive';
+import { NgxInfiniteScrollerModule } from './../app/ngx-infinite-scroller';
+import { NgxInfiniteScrollerDirective } from './../app/directive/ngx-infinite-scroller.directive';
 
 @NgModule({
   declarations: [
@@ -13,7 +13,7 @@ import { NgxInfiniteScrollDirective } from './../app/directive/ngx-infinite-scro
   ],
   imports: [
     BrowserModule,
-    NgxInfiniteScrollModule,
+    NgxInfiniteScrollerModule,
     HttpClientModule
   ],
   providers: [],
