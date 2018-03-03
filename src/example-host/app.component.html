@@ -1,8 +1,8 @@
 <ul id="scroller"
     ngxInfiniteScroller
     (onScrollUp)="onScrollUp()">
-  <li *ngFor="let item of news"
-      style="padding: 30px;">
+  <li class="news"
+      *ngFor="let item of news">
     {{item.title}}
   </li>
 </ul>
