@@ -14,14 +14,12 @@ Include `NgxInfiniteScrollerModule` in your module
 import { NgxInfiniteScrollerModule } from 'ngx-infinite-scroller';
 
 @NgModule({
-  declarations: [
-  ],
+  declarations: [],
   imports: [
     NgxInfiniteScrollerModule,
   ],
   providers: [],
-  bootstrap: [
-  ]
+  bootstrap: []
 })
 ```
 
@@ -31,11 +29,30 @@ Include `ngxInfiniteScroller` directive in your `*.component.html` file
 <ul id="scroller"
     ngxInfiniteScroller
     (onScrollUp)="onScrollUp()">
-  <li *ngFor="let item of news">
+  <li class="news"
+      *ngFor="let item of news">
     {{item.title}}
   </li>
 </ul>
 ```
+
+Add some styling in your `*.component.scss` file
+
+```scss
+#scroller {
+  height: 500px;
+  width: 700px;
+  border: 1px solid red;
+  overflow: scroll;
+  padding: 0;
+  list-style: none;
+}
+
+.news {
+  padding: 30px;
+}
+```
+
 Handle `onScrollUp` action in your `*.component.ts` file
 
 ```typescript
