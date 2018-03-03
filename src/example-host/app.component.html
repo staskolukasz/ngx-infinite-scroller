@@ -1,0 +1,8 @@
+<ul id="scroller"
+    ngxInfiniteScroll
+    (onScrollUp)="onScrollUp()">
+  <li *ngFor="let item of items"
+      style="padding: 30px;">
+    {{item.title}}
+  </li>
+</ul>
