@@ -3,6 +3,9 @@ import { HttpClient } from '@angular/common/http';
 
 import { Subject } from 'rxjs/Subject';
 
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/skipWhile';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -10,25 +13,24 @@ import { Subject } from 'rxjs/Subject';
 })
 export class AppComponent implements OnInit {
 
-  public items: Array<any> = [];
+  public news: Array<any> = [];
 
-  public currentPage = 1;
+  public httpReqestInProgress: boolean = false;
 
-  public lock: boolean = false;
+  private currentPage = 1;
 
   constructor(private http: HttpClient) { }
 
   public ngOnInit() { }
 
   public onScrollUp(): void {
-    if (this.lock) { return; }
-
     this.getNews(this.currentPage)
-      .do(() => { this.lock = true })
+      .skipWhile(() => this.httpReqestInProgress)
+      .do(() => { this.httpReqestInProgress = true })
       .subscribe((news) => {
         this.currentPage++;
-        this.items = this.items.concat(news);
-        this.lock = false;
+        this.news = this.news.concat(news);
+        this.httpReqestInProgress = false;
       });
   }
 
