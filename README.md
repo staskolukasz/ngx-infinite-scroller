@@ -35,6 +35,19 @@ Include `ngxInfiniteScroll` directive in your `*.component.html` file
 Handle `onScrollUp` action in your `*.component.ts` file
 
 ```typescript
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+import { Subject } from 'rxjs/Subject';
+
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/skipWhile';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
+})
 export class AppComponent implements OnInit {
 
   public news: Array<any> = [];
@@ -48,9 +61,8 @@ export class AppComponent implements OnInit {
   public ngOnInit() { }
 
   public onScrollUp(): void {
-    if (this.httpReqestInProgress) { return; }
-
     this.getNews(this.currentPage)
+      .skipWhile(() => this.httpReqestInProgress)
       .do(() => { this.httpReqestInProgress = true })
       .subscribe((news) => {
         this.currentPage++;
