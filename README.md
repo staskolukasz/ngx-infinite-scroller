@@ -85,4 +85,4 @@ export class AppComponent implements OnInit {
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-Run `npm run build:library` to build the library. The build artifacts will be stored in the `list-dist/` directory.
+Run `npm run packagr` to build the library. The build artifacts will be stored in the `dist` directory.
