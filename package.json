@@ -1,6 +1,6 @@
 {
   "name": "ngx-infinite-scroller",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Infinite reverse scroll directive for Angular 5",
   "scripts": {
     "ng": "ng",
