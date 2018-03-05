@@ -67,6 +67,10 @@
     "reverse"
   ],
   "homepage": "https://github.com/staskolukasz/ngx-infinite-scroller",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/staskolukasz/ngx-infinite-scroller.git"
+  },
   "author": "Lukasz Stasko",
   "license": "MIT"
 }
