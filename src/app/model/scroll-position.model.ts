@@ -1,6 +1,3 @@
-export const scrollUpAction = 'SCROLL_UP_ACTION';
-export const scrollDownAction = 'SCROLL_DOWN_ACTION';
-
 export interface ScrollPosition {
   scrollHeight: number;
   scrollTop: number;
