@@ -26,6 +26,9 @@ import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/skipWhile';
 import 'rxjs/add/operator/debounceTime';
 
+import { DirectiveContext } from './implementation/directive-context';
+import { ScrollingTop } from './implementation/scrolling-top';
+
 import { NgxInfiniteScrollerUtil } from './ngx-infinite-scroller.util';
 
 import { ScrollPosition } from './model/scroll-position.model';
@@ -34,7 +37,12 @@ import { initialScrollPosition } from './model/scroll-position.model';
 @Directive({
   selector: '[ngxInfiniteScroller]'
 })
-export class NgxInfiniteScrollerDirective implements AfterViewInit, OnInit, OnDestroy {
+export class NgxInfiniteScrollerDirective
+  extends DirectiveContext
+  implements AfterViewInit, OnInit, OnDestroy {
+
+  @Input()
+  public strategy: string = 'scrollingTop';
 
   @Input()
   public scrollbarAnimationInterval = 100;
@@ -48,80 +56,59 @@ export class NgxInfiniteScrollerDirective implements AfterViewInit, OnInit, OnDe
   @Output()
   public onScrollUp: EventEmitter<null> = new EventEmitter<null>();
 
-  private scrollChanged: Observable<Event>;
+  @Output()
+  public onScrollDown: EventEmitter<null> = new EventEmitter<null>();
 
-  private get scrollPositionChanged(): Observable<ScrollPosition[]> {
-    if (this.scrollChanged) {
-      return this.scrollChanged
-        .takeWhile(() => this.scrollStreamActive)
-        .map((e: any) => {
-          return <ScrollPosition>{
-            scrollHeight: e.target.scrollHeight,
-            scrollTop: e.target.scrollTop,
-            clientHeight: e.target.clientHeight,
-          }
-        })
-        .pairwise()
-        .debounceTime(this.scrollbarAnimationInterval)
-    }
-  }
+  public previousScrollTop: number;
 
-  private get scrollDownChanged(): Observable<ScrollPosition[]> {
-    return this.scrollPositionChanged
-      .filter((scrollPositions: ScrollPosition[]) => {
-        return NgxInfiniteScrollerUtil.wasScrolledDown(
-          scrollPositions[0],
-          scrollPositions[1]
-        );
-      });
-  }
+  public previousScrollHeight: number;
 
-  private get scrollUpChanged(): Observable<ScrollPosition[]> {
-    return this.scrollPositionChanged
-      .filter((scrollPositions: ScrollPosition[]) => {
-        return NgxInfiniteScrollerUtil.wasScrolledUp(
-          scrollPositions[0],
-          scrollPositions[1]
-        );
-      });
-  }
+  public scrollStreamActive: boolean;
 
-  private get scrollRequestZoneEntered(): Observable<ScrollPosition[]> {
-    return this.scrollUpChanged
-      .filter((scrollPositions: ScrollPosition[]) => {
-        return NgxInfiniteScrollerUtil.isScrollUpEnough(
-          scrollPositions[0],
-          this.scrollUpPercentilePositionTrigger
-        );
-      })
-  }
-
-  private get requestDispatcher(): Observable<ScrollPosition[]> {
-    return this.scrollRequestZoneEntered
-      .do(() => {
-        this.previousScrollTop = this.el.nativeElement.scrollTop;
-        this.previousScrollHeight = this.el.nativeElement.scrollHeight;
-      })
-      .startWith([initialScrollPosition, initialScrollPosition]);
-  }
-
-  private previousScrollTop: number;
-
-  private previousScrollHeight: number;
+  private initMode: boolean;
 
   private domMutationObserver: MutationObserver;
 
   private domMutationEmitter: Subject<MutationRecord[]>;
 
-  private scrollStreamActive: boolean;
+  private scrollChanged: Observable<Event>;
 
-  private initMode: boolean;
+  private get scrollPositionChanged(): Observable<ScrollPosition[]> {
+    if (this.scrollChanged) {
+      return this.scrollingStrategy.scrollPositionChanged(this.scrollChanged);
+    }
+  }
+
+  // private get scrollDownChanged(): Observable<ScrollPosition[]> {
+  //   return this.scrollPositionChanged
+  //     .filter((scrollPositions: ScrollPosition[]) => {
+  //       return NgxInfiniteScrollerUtil.wasScrolledDown(
+  //         scrollPositions[0],
+  //         scrollPositions[1]
+  //       );
+  //     });
+  // }
+
+  private get scrollTypeChanged(): Observable<ScrollPosition[]> {
+    return this.scrollingStrategy.scrollTypeChanged(this.scrollPositionChanged);
+  }
+
+  private get scrollRequestZoneEntered(): Observable<ScrollPosition[]> {
+    return this.scrollingStrategy.scrollRequestZoneEntered(this.scrollTypeChanged);
+  }
+
+  private get requestDispatcher(): Observable<ScrollPosition[]> {
+    return this.scrollingStrategy.requestDispatcher(this.scrollRequestZoneEntered);
+  }
+
 
   constructor(
-    private el: ElementRef,
-    private renderer: Renderer2,
-    private zone: NgZone
-  ) { }
+    el: ElementRef,
+    renderer: Renderer2
+  ) {
+    super(el, renderer);
+    this.scrollingStrategy = new ScrollingTop(this);
+  }
 
   public ngOnInit(): void {
     this.domMutationEmitter = new Subject<MutationRecord[]>();
@@ -143,16 +130,6 @@ export class NgxInfiniteScrollerDirective implements AfterViewInit, OnInit, OnDe
     this.domMutationObserver.disconnect();
   }
 
-  public scrollTo(scrollTop?: number): void {
-    this.scrollStreamActive = false;
-    this.renderer.setProperty(
-      this.el.nativeElement,
-      'scrollTop',
-      scrollTop || this.el.nativeElement.scrollHeight
-    );
-    this.scrollStreamActive = true;
-  }
-
   private registerScrollEventHandler(): void {
     this.scrollChanged = Observable.fromEvent(this.el.nativeElement, 'scroll');
   }
@@ -172,7 +149,7 @@ export class NgxInfiniteScrollerDirective implements AfterViewInit, OnInit, OnDe
       .takeWhile(() => this.initMode)
       .debounceTime(this.scrollDebounceTimeAfterDOMMutation)
       .subscribe(() => {
-        this.scrollTo();
+        this.scrollingStrategy.scrollTo();
         this.initMode = false;
       });
   }
@@ -183,15 +160,13 @@ export class NgxInfiniteScrollerDirective implements AfterViewInit, OnInit, OnDe
       .skipWhile(() => this.initMode)
       .debounceTime(this.scrollDebounceTimeAfterDOMMutation)
       .subscribe(() => {
-        const newScrollPosition = this.previousScrollTop +
-          (this.el.nativeElement.scrollHeight - this.previousScrollHeight);
-        this.scrollTo(newScrollPosition);
+        this.scrollingStrategy.setNewScrollPosition();
       });
   }
 
   private registerRequestDispatcher(): void {
     this.requestDispatcher.subscribe(() => {
-      this.onScrollUp.next();
+      this.scrollingStrategy.onScroll();
     });
   }
 }

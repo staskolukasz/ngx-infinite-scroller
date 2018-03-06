@@ -5,15 +5,7 @@ export class NgxInfiniteScrollerUtil {
     return prevPos.scrollTop < currentPos.scrollTop;
   }
 
-  public static wasScrolledUp(prevPos: ScrollPosition, currentPos: ScrollPosition): boolean {
-    return !NgxInfiniteScrollerUtil.wasScrolledDown(prevPos, currentPos);
-  }
-
   public static isScrollDownEnough(pos: ScrollPosition, scrollPositionTrigger: number): boolean {
     return ((pos.scrollTop + pos.clientHeight) / pos.scrollHeight) > (scrollPositionTrigger / 100);
-  }
-
-  public static isScrollUpEnough(pos: ScrollPosition, scrollPositionTrigger: number): boolean {
-    return (pos.scrollTop / pos.scrollHeight) < (scrollPositionTrigger / 100);
   }
 }
