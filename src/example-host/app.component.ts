@@ -29,6 +29,17 @@ export class AppComponent implements OnInit {
       .do(() => { this.httpReqestInProgress = true })
       .subscribe((news) => {
         this.currentPage++;
+        this.news.unshift(news);
+        this.httpReqestInProgress = false;
+      });
+  }
+
+  public onScrollDown(): void {
+    this.getNews(this.currentPage)
+      .skipWhile(() => this.httpReqestInProgress)
+      .do(() => { this.httpReqestInProgress = true })
+      .subscribe((news) => {
+        this.currentPage++;
         this.news = this.news.concat(news);
         this.httpReqestInProgress = false;
       });
