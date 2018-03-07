@@ -26,14 +26,12 @@ import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/skipWhile';
 import 'rxjs/add/operator/debounceTime';
 
+import { ScrollPosition } from './model/scroll-position.model';
+import { initialScrollPosition } from './model/scroll-position.model';
+
 import { DirectiveContext } from './implementation/directive-context';
 import { ScrollingToTop } from './implementation/scrolling-to-top';
 import { ScrollingToBottom } from './implementation/scrolling-to-bottom';
-
-import { NgxInfiniteScrollerUtil } from './ngx-infinite-scroller.util';
-
-import { ScrollPosition } from './model/scroll-position.model';
-import { initialScrollPosition } from './model/scroll-position.model';
 
 @Directive({
   selector: '[ngxInfiniteScroller]'
