@@ -49,7 +49,7 @@ export class NgxInfiniteScrollerDirective
   public scrollbarAnimationInterval = 100;
 
   @Input()
-  public scrollDebounceTimeAfterDOMMutation = 300;
+  public scrollDebounceTimeAfterDOMMutation = 400;
 
   @Input()
   public scrollUpPercentilePositionTrigger = 5;
@@ -102,7 +102,11 @@ export class NgxInfiniteScrollerDirective
   }
 
   private get scrollRequestChanged(): Observable<ScrollPosition[]> {
-    return this.scrollingStrategy.scrollRequestChanged(this.scrollRequestZoneChanged);
+    return this.scrollRequestZoneChanged
+      .do(() => {
+        this.previousScrollTop = this.el.nativeElement.scrollTop;
+        this.previousScrollHeight = this.el.nativeElement.scrollHeight;
+      });
   }
 
   constructor(
@@ -117,7 +121,7 @@ export class NgxInfiniteScrollerDirective
       case 'scrollingToTop':
         this.scrollingStrategy = new ScrollingToTop(this);
         break;
-      case 'scrollingToBottom':
+      case 'scrollingToBottom': default:
         this.scrollingStrategy = new ScrollingToBottom(this);
         break;
     }

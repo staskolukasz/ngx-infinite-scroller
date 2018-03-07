@@ -11,9 +11,9 @@ export class ScrollingToBottom implements ScrollingStrategy {
     this.directive = directive;
   }
 
-  public scrollDirectionChanged(scrollPositionChanged: Observable<ScrollPosition[]>):
+  public scrollDirectionChanged(scrollPairChanged: Observable<ScrollPosition[]>):
     Observable<ScrollPosition[]> {
-    return scrollPositionChanged
+    return scrollPairChanged
       .filter((scrollPositions: ScrollPosition[]) => {
         return this.wasScrolledDown(
           scrollPositions[0],
@@ -22,25 +22,15 @@ export class ScrollingToBottom implements ScrollingStrategy {
       });
   }
 
-  public scrollRequestZoneChanged(scrollTypeChanged: Observable<ScrollPosition[]>):
+  public scrollRequestZoneChanged(scrollDirectionChanged: Observable<ScrollPosition[]>):
     Observable<ScrollPosition[]> {
-    return scrollTypeChanged
+    return scrollDirectionChanged
       .filter((scrollPositions: ScrollPosition[]) => {
         return this.isScrollDownEnough(
           scrollPositions[1],
           this.directive.scrollDownPercentilePositionTrigger
         );
       })
-  }
-
-  public scrollRequestChanged(scrollRequestZoneEntered: Observable<ScrollPosition[]>):
-    Observable<ScrollPosition[]> {
-    return scrollRequestZoneEntered
-      .do(() => {
-        this.directive.previousScrollTop = this.directive.el.nativeElement.scrollTop;
-        this.directive.previousScrollHeight = this.directive.el.nativeElement.scrollHeight;
-      })
-      .startWith([initialScrollPosition, initialScrollPosition]);
   }
 
   public setInitialScrollPosition(): void {
