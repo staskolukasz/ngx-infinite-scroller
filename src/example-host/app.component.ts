@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Subject } from 'rxjs/Subject';
-
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/skipWhile';
 

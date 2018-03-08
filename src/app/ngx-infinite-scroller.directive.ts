@@ -1,14 +1,13 @@
 import {
   Directive,
+  OnDestroy,
+  OnInit,
   AfterViewInit,
   ElementRef,
   Input,
   Output,
   EventEmitter,
   Renderer2,
-  NgZone,
-  OnDestroy,
-  OnInit
 } from '@angular/core';
 
 import { Subject } from 'rxjs/Subject';

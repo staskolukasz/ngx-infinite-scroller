@@ -54,8 +54,6 @@ Handle `onScrollUp` and `onScrollDown` actions in your `*.component.ts` file
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Subject } from 'rxjs/Subject';
-
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/skipWhile';
 
@@ -114,7 +112,7 @@ export class AppComponent implements OnInit {
 
 ### *.component.scss configuration
 
-Add some styling to your `*.component.scss` file
+Add some styling in your `*.component.scss` file
 
 ```scss
 #scroller {
