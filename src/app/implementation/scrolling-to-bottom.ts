@@ -1,7 +1,8 @@
-import { ScrollingStrategy } from "./scrolling-strategy";
-import { Observable } from "rxjs/Observable";
-import { ScrollPosition, initialScrollPosition } from "./../model/scroll-position.model";
-import { NgxInfiniteScrollerDirective } from "../ngx-infinite-scroller.directive";
+import { Observable } from 'rxjs/Observable';
+import { ScrollPosition, initialScrollPosition } from './../model/scroll-position.model';
+
+import { ScrollingStrategy } from './scrolling-strategy';
+import { NgxInfiniteScrollerDirective } from '../ngx-infinite-scroller.directive';
 
 export class ScrollingToBottom implements ScrollingStrategy {
 
@@ -30,11 +31,11 @@ export class ScrollingToBottom implements ScrollingStrategy {
           scrollPositions[1],
           this.directive.scrollDownPercentilePositionTrigger
         );
-      })
+      });
   }
 
   public setInitialScrollPosition(): void {
-    this.directive.scrollTo(0)
+    this.directive.scrollTo(0);
   }
 
   public setPreviousScrollPosition(): void {

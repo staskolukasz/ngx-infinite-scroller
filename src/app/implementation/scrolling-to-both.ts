@@ -4,7 +4,7 @@ import { NgxInfiniteScrollerDirective } from '../ngx-infinite-scroller.directive
 import { ScrollingStrategy } from './scrolling-strategy';
 import { ScrollPosition, initialScrollPosition } from './../model/scroll-position.model';
 
-export class ScrollingToTop implements ScrollingStrategy {
+export class ScrollingToBoth implements ScrollingStrategy {
 
   private directive: NgxInfiniteScrollerDirective;
 

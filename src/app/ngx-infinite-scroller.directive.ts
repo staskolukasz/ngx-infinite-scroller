@@ -32,6 +32,7 @@ import { initialScrollPosition } from './model/scroll-position.model';
 import { DirectiveContext } from './implementation/directive-context';
 import { ScrollingToTop } from './implementation/scrolling-to-top';
 import { ScrollingToBottom } from './implementation/scrolling-to-bottom';
+import { ScrollingToBoth } from './implementation/scrolling-to-both';
 
 @Directive({
   selector: '[ngxInfiniteScroller]'
@@ -84,10 +85,10 @@ export class NgxInfiniteScrollerDirective
             scrollHeight: e.target.scrollHeight,
             scrollTop: e.target.scrollTop,
             clientHeight: e.target.clientHeight,
-          }
+          };
         })
         .pairwise()
-        .debounceTime(this.scrollbarAnimationInterval)
+        .debounceTime(this.scrollbarAnimationInterval);
     }
   }
 
@@ -116,6 +117,9 @@ export class NgxInfiniteScrollerDirective
 
   public ngOnInit(): void {
     switch (this.strategy) {
+      case 'scrollingToBoth':
+        this.scrollingStrategy = new ScrollingToBoth(this);
+        break;
       case 'scrollingToTop':
         this.scrollingStrategy = new ScrollingToTop(this);
         break;
