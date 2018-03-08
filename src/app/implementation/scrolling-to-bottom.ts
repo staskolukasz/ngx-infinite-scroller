@@ -35,6 +35,10 @@ export class ScrollingToBottom implements ScrollingStrategy {
       });
   }
 
+  public askForUpdate(): void {
+    this.directive.onScrollDown.next();
+  }
+
   public setInitialScrollPosition(): void {
     this.directive.scrollTo(0);
   }
@@ -42,9 +46,5 @@ export class ScrollingToBottom implements ScrollingStrategy {
   public setPreviousScrollPosition(): void {
     const prevScrollPosition = this.directive.previousScrollTop;
     this.directive.scrollTo(prevScrollPosition);
-  }
-
-  public scrollRequest(): void {
-    this.directive.onScrollDown.next();
   }
 }

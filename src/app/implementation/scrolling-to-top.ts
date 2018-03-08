@@ -35,6 +35,10 @@ export class ScrollingToTop implements ScrollingStrategy {
       });
   }
 
+  public askForUpdate(): void {
+    this.directive.onScrollUp.next();
+  }
+
   public setInitialScrollPosition(): void {
     this.directive.scrollTo(this.directive.el.nativeElement.scrollHeight);
   }
@@ -43,9 +47,5 @@ export class ScrollingToTop implements ScrollingStrategy {
     const prevScrollPosition = this.directive.previousScrollTop +
       (this.directive.el.nativeElement.scrollHeight - this.directive.previousScrollHeight);
     this.directive.scrollTo(prevScrollPosition);
-  }
-
-  public scrollRequest(): void {
-    this.directive.onScrollUp.next();
   }
 }

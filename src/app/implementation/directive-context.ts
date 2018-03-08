@@ -1,13 +1,6 @@
 import {
   ElementRef,
-  Renderer2,
-  NgZone,
-  Input,
-  Output,
-  EventEmitter,
-  AfterViewInit,
-  OnInit,
-  OnDestroy
+  Renderer2
 } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';

@@ -17,11 +17,7 @@ export class ScrollingToBoth implements ScrollingStrategy {
 
   public scrollDirectionChanged(scrollPairChanged: Observable<ScrollPosition[]>):
     Observable<ScrollPosition[]> {
-    return scrollPairChanged.do((scrollPositions: ScrollPosition[]) => {
-      this.scrolledUp = Utils.wasScrolledUp(
-        scrollPositions[0],
-        scrollPositions[1]);
-    });
+    return scrollPairChanged;
   }
 
   public scrollRequestZoneChanged(scrollDirectionChanged: Observable<ScrollPosition[]>):
@@ -35,7 +31,20 @@ export class ScrollingToBoth implements ScrollingStrategy {
           scrollPositions[1],
           this.directive.scrollDownPercentilePositionTrigger
         ));
-      });
+      })
+      .do((scrollPositions: ScrollPosition[]) => {
+        this.scrolledUp = Utils.wasScrolledUp(
+          scrollPositions[0],
+          scrollPositions[1]);
+      });;
+  }
+
+  public askForUpdate(): void {
+    if (this.scrolledUp) {
+      this.directive.onScrollUp.next();
+    } else {
+      this.directive.onScrollDown.next();
+    }
   }
 
   public setInitialScrollPosition(): void {
@@ -49,18 +58,9 @@ export class ScrollingToBoth implements ScrollingStrategy {
       prevScrollPosition = this.directive.previousScrollTop +
         (this.directive.el.nativeElement.scrollHeight - this.directive.previousScrollHeight);
     } else {
-      console.log('down');
       prevScrollPosition = this.directive.previousScrollTop;
     }
 
     this.directive.scrollTo(prevScrollPosition);
-  }
-
-  public scrollRequest(): void {
-    if (this.scrolledUp) {
-      this.directive.onScrollUp.next();
-    } else {
-      this.directive.onScrollDown.next();
-    }
   }
 }

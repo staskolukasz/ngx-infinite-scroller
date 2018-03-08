@@ -47,7 +47,7 @@ export class NgxInfiniteScrollerDirective
   public scrollbarAnimationInterval = 100;
 
   @Input()
-  public scrollDebounceTimeAfterDOMMutation = 50;
+  public scrollDebounceTimeAfterDOMMutation = 100;
 
   @Input()
   public scrollDebounceTimeAfterDOMMutationOnInit = 500;
@@ -99,11 +99,7 @@ export class NgxInfiniteScrollerDirective
   }
 
   private get scrollRequestZoneChanged(): Observable<ScrollPosition[]> {
-    return this.scrollingStrategy.scrollRequestZoneChanged(this.scrollDirectionChanged);
-  }
-
-  private get scrollRequestChanged(): Observable<ScrollPosition[]> {
-    return this.scrollRequestZoneChanged
+    return this.scrollingStrategy.scrollRequestZoneChanged(this.scrollDirectionChanged)
       .do(() => {
         this.previousScrollTop = this.el.nativeElement.scrollTop;
         this.previousScrollHeight = this.el.nativeElement.scrollHeight;
@@ -181,7 +177,7 @@ export class NgxInfiniteScrollerDirective
 
   private registerPreviousScrollPositionHandler(): void {
     Observable
-      .zip(this.scrollRequestChanged, this.domMutationEmitter)
+      .zip(this.scrollRequestZoneChanged, this.domMutationEmitter)
       .skipWhile(() => this.initMode)
       .debounceTime(this.scrollDebounceTimeAfterDOMMutation)
       .subscribe(() => {
@@ -190,8 +186,8 @@ export class NgxInfiniteScrollerDirective
   }
 
   private registerScrollSpy(): void {
-    this.scrollRequestChanged.subscribe(() => {
-      this.scrollingStrategy.scrollRequest();
+    this.scrollRequestZoneChanged.subscribe(() => {
+      this.scrollingStrategy.askForUpdate();
     });
   }
 }

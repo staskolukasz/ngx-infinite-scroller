@@ -10,9 +10,9 @@ export interface ScrollingStrategy {
     scrollDirectionChanged: Observable<ScrollPosition[]>
   ): Observable<ScrollPosition[]>;
 
+  askForUpdate(): void;
+
   setInitialScrollPosition(): void;
 
   setPreviousScrollPosition(): void;
-
-  scrollRequest(): void;
 }
