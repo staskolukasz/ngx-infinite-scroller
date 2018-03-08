@@ -36,7 +36,7 @@ export class ScrollingToBoth implements ScrollingStrategy {
         this.scrolledUp = Utils.wasScrolledUp(
           scrollPositions[0],
           scrollPositions[1]);
-      });;
+      });
   }
 
   public askForUpdate(): void {
