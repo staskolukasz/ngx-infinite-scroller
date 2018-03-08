@@ -22,36 +22,37 @@ export class AppComponent implements OnInit {
   constructor(private http: HttpClient) { }
 
   public ngOnInit() {
-    this.getNews(this.currentPage)
-      .subscribe((news) => {
-        this.currentPage++;
+    this.getNews(
+      this.currentPage,
+      (news) => {
         this.news = this.news.concat(news);
       });
   }
 
   public onScrollUp(): void {
-    this.getNews(this.currentPage)
-      .skipWhile(() => this.httpReqestInProgress)
-      .do(() => { this.httpReqestInProgress = true })
-      .subscribe((news: any[]) => {
-        this.currentPage++;
+    this.getNews(
+      this.currentPage,
+      (news) => {
         this.news = news.concat(this.news);
-        this.httpReqestInProgress = false;
       });
   }
 
   public onScrollDown(): void {
-    this.getNews(this.currentPage)
-      .skipWhile(() => this.httpReqestInProgress)
-      .do(() => { this.httpReqestInProgress = true })
-      .subscribe((news) => {
-        this.currentPage++;
+    this.getNews(
+      this.currentPage,
+      (news) => {
         this.news = this.news.concat(news);
-        this.httpReqestInProgress = false;
       });
   }
 
-  private getNews(page: number = 1) {
-    return this.http.get(`https://node-hnapi.herokuapp.com/news?page=${page}`);
+  private getNews(page: number = 1, saveResultsCallback: (news) => void) {
+    return this.http.get(`https://node-hnapi.herokuapp.com/news?page=${page}`)
+      .skipWhile(() => this.httpReqestInProgress)
+      .do(() => { this.httpReqestInProgress = true; })
+      .subscribe((news: any[]) => {
+        this.currentPage++;
+        saveResultsCallback(news);
+        this.httpReqestInProgress = false;
+      });
   }
 }

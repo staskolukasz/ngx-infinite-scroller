@@ -1,12 +1,15 @@
 import { Observable } from 'rxjs/Observable';
 import { NgxInfiniteScrollerDirective } from '../ngx-infinite-scroller.directive';
 
+import { Utils } from './utils';
 import { ScrollingStrategy } from './scrolling-strategy';
-import { ScrollPosition, initialScrollPosition } from './../model/scroll-position.model';
+import { ScrollPosition } from './../model/scroll-position.model';
 
 export class ScrollingToBoth implements ScrollingStrategy {
 
   private directive: NgxInfiniteScrollerDirective;
+
+  private scrolledUp: boolean;
 
   constructor(directive: NgxInfiniteScrollerDirective) {
     this.directive = directive;
@@ -14,45 +17,50 @@ export class ScrollingToBoth implements ScrollingStrategy {
 
   public scrollDirectionChanged(scrollPairChanged: Observable<ScrollPosition[]>):
     Observable<ScrollPosition[]> {
-    return scrollPairChanged
-      .filter((scrollPositions: ScrollPosition[]) => {
-        return this.wasScrolledUp(
-          scrollPositions[0],
-          scrollPositions[1]
-        );
-      });
+    return scrollPairChanged.do((scrollPositions: ScrollPosition[]) => {
+      this.scrolledUp = Utils.wasScrolledUp(
+        scrollPositions[0],
+        scrollPositions[1]);
+    });
   }
 
   public scrollRequestZoneChanged(scrollDirectionChanged: Observable<ScrollPosition[]>):
     Observable<ScrollPosition[]> {
     return scrollDirectionChanged
       .filter((scrollPositions: ScrollPosition[]) => {
-        return this.isScrollUpEnough(
+        return (Utils.isScrollUpEnough(
           scrollPositions[1],
           this.directive.scrollUpPercentilePositionTrigger
-        );
+        ) || Utils.isScrollDownEnough(
+          scrollPositions[1],
+          this.directive.scrollDownPercentilePositionTrigger
+        ));
       });
   }
 
   public setInitialScrollPosition(): void {
-    this.directive.scrollTo(this.directive.el.nativeElement.scrollHeight);
+    this.directive.scrollTo(this.directive.el.nativeElement.scrollHeight / 2 - this.directive.el.nativeElement.clientHeight / 2);
   }
 
   public setPreviousScrollPosition(): void {
-    const newScrollPosition = this.directive.previousScrollTop +
-      (this.directive.el.nativeElement.scrollHeight - this.directive.previousScrollHeight);
-    this.directive.scrollTo(newScrollPosition);
+    let prevScrollPosition;
+
+    if (this.scrolledUp) {
+      prevScrollPosition = this.directive.previousScrollTop +
+        (this.directive.el.nativeElement.scrollHeight - this.directive.previousScrollHeight);
+    } else {
+      console.log('down');
+      prevScrollPosition = this.directive.previousScrollTop;
+    }
+
+    this.directive.scrollTo(prevScrollPosition);
   }
 
   public scrollRequest(): void {
-    this.directive.onScrollUp.next();
-  }
-
-  private wasScrolledUp(prevPos: ScrollPosition, currentPos: ScrollPosition): boolean {
-    return prevPos.scrollTop > currentPos.scrollTop;
-  }
-
-  private isScrollUpEnough(pos: ScrollPosition, scrollPositionTrigger: number): boolean {
-    return (pos.scrollTop / pos.scrollHeight) < (scrollPositionTrigger / 100);
+    if (this.scrolledUp) {
+      this.directive.onScrollUp.next();
+    } else {
+      this.directive.onScrollDown.next();
+    }
   }
 }

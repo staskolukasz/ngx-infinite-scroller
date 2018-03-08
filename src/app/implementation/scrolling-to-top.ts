@@ -1,8 +1,9 @@
 import { Observable } from 'rxjs/Observable';
 import { NgxInfiniteScrollerDirective } from '../ngx-infinite-scroller.directive';
 
+import { Utils } from './utils';
 import { ScrollingStrategy } from './scrolling-strategy';
-import { ScrollPosition, initialScrollPosition } from './../model/scroll-position.model';
+import { ScrollPosition } from './../model/scroll-position.model';
 
 export class ScrollingToTop implements ScrollingStrategy {
 
@@ -16,7 +17,7 @@ export class ScrollingToTop implements ScrollingStrategy {
     Observable<ScrollPosition[]> {
     return scrollPairChanged
       .filter((scrollPositions: ScrollPosition[]) => {
-        return this.wasScrolledUp(
+        return Utils.wasScrolledUp(
           scrollPositions[0],
           scrollPositions[1]
         );
@@ -27,7 +28,7 @@ export class ScrollingToTop implements ScrollingStrategy {
     Observable<ScrollPosition[]> {
     return scrollDirectionChanged
       .filter((scrollPositions: ScrollPosition[]) => {
-        return this.isScrollUpEnough(
+        return Utils.isScrollUpEnough(
           scrollPositions[1],
           this.directive.scrollUpPercentilePositionTrigger
         );
@@ -39,20 +40,12 @@ export class ScrollingToTop implements ScrollingStrategy {
   }
 
   public setPreviousScrollPosition(): void {
-    const newScrollPosition = this.directive.previousScrollTop +
+    const prevScrollPosition = this.directive.previousScrollTop +
       (this.directive.el.nativeElement.scrollHeight - this.directive.previousScrollHeight);
-    this.directive.scrollTo(newScrollPosition);
+    this.directive.scrollTo(prevScrollPosition);
   }
 
   public scrollRequest(): void {
     this.directive.onScrollUp.next();
-  }
-
-  private wasScrolledUp(prevPos: ScrollPosition, currentPos: ScrollPosition): boolean {
-    return prevPos.scrollTop > currentPos.scrollTop;
-  }
-
-  private isScrollUpEnough(pos: ScrollPosition, scrollPositionTrigger: number): boolean {
-    return (pos.scrollTop / pos.scrollHeight) < (scrollPositionTrigger / 100);
   }
 }

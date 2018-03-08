@@ -27,7 +27,6 @@ import 'rxjs/add/operator/skipWhile';
 import 'rxjs/add/operator/debounceTime';
 
 import { ScrollPosition } from './model/scroll-position.model';
-import { initialScrollPosition } from './model/scroll-position.model';
 
 import { DirectiveContext } from './implementation/directive-context';
 import { ScrollingToTop } from './implementation/scrolling-to-top';
@@ -39,7 +38,7 @@ import { ScrollingToBoth } from './implementation/scrolling-to-both';
 })
 export class NgxInfiniteScrollerDirective
   extends DirectiveContext
-  implements AfterViewInit, OnInit, OnDestroy {
+  implements OnInit, AfterViewInit, OnDestroy {
 
   @Input()
   public strategy: string = 'scrollingToTop';
@@ -48,13 +47,16 @@ export class NgxInfiniteScrollerDirective
   public scrollbarAnimationInterval = 100;
 
   @Input()
-  public scrollDebounceTimeAfterDOMMutation = 400;
+  public scrollDebounceTimeAfterDOMMutation = 50;
 
   @Input()
-  public scrollUpPercentilePositionTrigger = 5;
+  public scrollDebounceTimeAfterDOMMutationOnInit = 500;
 
   @Input()
-  public scrollDownPercentilePositionTrigger = 95;
+  public scrollUpPercentilePositionTrigger = 2;
+
+  @Input()
+  public scrollDownPercentilePositionTrigger = 98;
 
   @Output()
   public onScrollUp: EventEmitter<null> = new EventEmitter<null>();
@@ -170,7 +172,7 @@ export class NgxInfiniteScrollerDirective
   private registerInitialScrollPostionHandler(): void {
     this.domMutationEmitter
       .takeWhile(() => this.initMode)
-      .debounceTime(this.scrollDebounceTimeAfterDOMMutation)
+      .debounceTime(this.scrollDebounceTimeAfterDOMMutationOnInit)
       .subscribe(() => {
         this.scrollingStrategy.setInitialScrollPosition();
         this.initMode = false;
