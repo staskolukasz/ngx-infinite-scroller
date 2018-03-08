@@ -42,7 +42,7 @@ By default directive works as infinite scroll from the top to the bottom of your
 `strategy="scrollingToBottom"` (default)  
 `strategy="scrollingToBoth"`
 
-Add some styling in your `*.component.scss` file
+Add some styling to your `*.component.scss` file
 
 ```scss
 #scroller {
