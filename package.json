@@ -1,7 +1,7 @@
 {
   "name": "ngx-infinite-scroller",
   "version": "0.2.0",
-  "description": "Infinite reverse scroll directive for Angular 5",
+  "description": "Infinite bidirectional scroll directive for Angular 5",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -63,6 +63,7 @@
     "infinite",
     "virtual",
     "scroll",
+    "bidirectional",
     "reverse"
   ],
   "homepage": "https://github.com/staskolukasz/ngx-infinite-scroller",
