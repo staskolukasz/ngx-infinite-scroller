@@ -41,7 +41,7 @@ export class NgxInfiniteScrollerDirective
   implements OnInit, AfterViewInit, OnDestroy {
 
   @Input()
-  public strategy: string = 'scrollingToTop';
+  public strategy: string = 'scrollingToBottom';
 
   @Input()
   public scrollbarAnimationInterval = 100;

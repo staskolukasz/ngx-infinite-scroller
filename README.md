@@ -1,6 +1,6 @@
 # ngx-infinite-scroller
 
-Infinite reverse scroll directive for Angular 5
+Infinite and bidirectional scroll directive for Angular 5
 
 ## Installation
 
@@ -28,23 +28,33 @@ Include `ngxInfiniteScroller` directive in your `*.component.html` file
 ```html
 <ul id="scroller"
     ngxInfiniteScroller
-    (onScrollUp)="onScrollUp()">
+    strategy="scrollingToBoth"
+    (onScrollUp)="onScrollUp()"
+    (onScrollUp)="onScrollDown()">
   <li class="news"
       *ngFor="let item of news">
     {{item.title}}
   </li>
 </ul>
 ```
+By default directive works as infinite scroll from top to the bottom of the list. To switch to other modes, use input parameters like
+`strategy="scrollingToTop"`
+`strategy="scrollingToBottom"` (default)
+`strategy="scrollingToBoth"`
+
+Remeber that you should also handle actions like
+`(onScrollUp)="onScrollUp()"`
+`(onScrollDown)="onScrollDown()"`
 
 Add some styling in your `*.component.scss` file
 
 ```scss
 #scroller {
-  height: 500px;
+  height: 100vh;
   width: 700px;
-  border: 1px solid red;
   overflow: scroll;
   padding: 0;
+  margin: 0;
   list-style: none;
 }
 
@@ -53,7 +63,7 @@ Add some styling in your `*.component.scss` file
 }
 ```
 
-Handle `onScrollUp` action in your `*.component.ts` file
+In your `*.component.ts`, using for instance `ngOnInit()` method, you should load data for the first time. You should also handle `onScrollUp` and `onScrollDown` actions like
 
 ```typescript
 import { Component, OnInit } from '@angular/core';
@@ -79,23 +89,42 @@ export class AppComponent implements OnInit {
 
   constructor(private http: HttpClient) { }
 
-  public ngOnInit() { }
-
-  public onScrollUp(): void {
-    this.getNews(this.currentPage)
-      .skipWhile(() => this.httpReqestInProgress)
-      .do(() => { this.httpReqestInProgress = true })
-      .subscribe((news) => {
-        this.currentPage++;
+  public ngOnInit() {
+    this.getNews(
+      this.currentPage,
+      (news) => {
         this.news = this.news.concat(news);
-        this.httpReqestInProgress = false;
       });
   }
 
-  private getNews(page: number = 1) {
-    return this.http.get(`https://node-hnapi.herokuapp.com/news?page=${page}`);
+  public onScrollUp(): void {
+    this.getNews(
+      this.currentPage,
+      (news) => {
+        this.news = news.concat(this.news);
+      });
+  }
+
+  public onScrollDown(): void {
+    this.getNews(
+      this.currentPage,
+      (news) => {
+        this.news = this.news.concat(news);
+      });
+  }
+
+  private getNews(page: number = 1, saveResultsCallback: (news) => void) {
+    return this.http.get(`https://node-hnapi.herokuapp.com/news?page=${page}`)
+      .skipWhile(() => this.httpReqestInProgress)
+      .do(() => { this.httpReqestInProgress = true; })
+      .subscribe((news: any[]) => {
+        this.currentPage++;
+        saveResultsCallback(news);
+        this.httpReqestInProgress = false;
+      });
   }
 }
+
 ```
 
 ## Development environment
