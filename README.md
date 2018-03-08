@@ -42,10 +42,6 @@ By default directive works as infinite scroll from the top to the bottom of your
 `strategy="scrollingToBottom"` (default)  
 `strategy="scrollingToBoth"`
 
-Remeber that you should also handle actions like
-`(onScrollUp)="onScrollUp()"`
-`(onScrollDown)="onScrollDown()"`
-
 Add some styling in your `*.component.scss` file
 
 ```scss
@@ -63,7 +59,7 @@ Add some styling in your `*.component.scss` file
 }
 ```
 
-In your `*.component.ts`, using for instance `ngOnInit()` method, you should load data for the first time. You should also handle `onScrollUp` and `onScrollDown` actions like
+Handle `onScrollUp` and `onScrollDown` actions in your `*.component.ts` file
 
 ```typescript
 import { Component, OnInit } from '@angular/core';
