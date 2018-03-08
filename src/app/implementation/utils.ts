@@ -1,12 +1,12 @@
-import { ScrollPosition } from './model/scroll-position.model';
+import { ScrollPosition } from './../model/scroll-position.model';
 
-export class NgxInfiniteScrollerUtil {
+export class Utils {
   public static wasScrolledDown(prevPos: ScrollPosition, currentPos: ScrollPosition): boolean {
     return prevPos.scrollTop < currentPos.scrollTop;
   }
 
   public static wasScrolledUp(prevPos: ScrollPosition, currentPos: ScrollPosition): boolean {
-    return !NgxInfiniteScrollerUtil.wasScrolledDown(prevPos, currentPos);
+    return !Utils.wasScrolledDown(prevPos, currentPos);
   }
 
   public static isScrollDownEnough(pos: ScrollPosition, scrollPositionTrigger: number): boolean {

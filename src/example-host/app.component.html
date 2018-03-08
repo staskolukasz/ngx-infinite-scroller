@@ -1,6 +1,8 @@
 <ul id="scroller"
     ngxInfiniteScroller
-    (onScrollUp)="onScrollUp()">
+    strategy="scrollingToBoth"
+    (onScrollUp)="onScrollUp()"
+    (onScrollDown)="onScrollDown()">
   <li class="news"
       *ngFor="let item of news">
     {{item.title}}

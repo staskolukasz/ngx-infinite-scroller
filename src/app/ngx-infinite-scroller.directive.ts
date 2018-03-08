@@ -1,14 +1,13 @@
 import {
   Directive,
+  OnDestroy,
+  OnInit,
   AfterViewInit,
   ElementRef,
   Input,
   Output,
   EventEmitter,
   Renderer2,
-  NgZone,
-  OnDestroy,
-  OnInit
 } from '@angular/core';
 
 import { Subject } from 'rxjs/Subject';
@@ -26,31 +25,59 @@ import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/skipWhile';
 import 'rxjs/add/operator/debounceTime';
 
-import { NgxInfiniteScrollerUtil } from './ngx-infinite-scroller.util';
-
 import { ScrollPosition } from './model/scroll-position.model';
-import { initialScrollPosition } from './model/scroll-position.model';
+
+import { DirectiveContext } from './implementation/directive-context';
+import { ScrollingToTop } from './implementation/scrolling-to-top';
+import { ScrollingToBottom } from './implementation/scrolling-to-bottom';
+import { ScrollingToBoth } from './implementation/scrolling-to-both';
 
 @Directive({
   selector: '[ngxInfiniteScroller]'
 })
-export class NgxInfiniteScrollerDirective implements AfterViewInit, OnInit, OnDestroy {
+export class NgxInfiniteScrollerDirective
+  extends DirectiveContext
+  implements OnInit, AfterViewInit, OnDestroy {
+
+  @Input()
+  public strategy: string = 'scrollingToBottom';
 
   @Input()
   public scrollbarAnimationInterval = 100;
 
   @Input()
-  public scrollDebounceTimeAfterDOMMutation = 300;
+  public scrollDebounceTimeAfterDOMMutation = 100;
 
   @Input()
-  public scrollUpPercentilePositionTrigger = 5;
+  public scrollDebounceTimeAfterDOMMutationOnInit = 1000;
+
+  @Input()
+  public scrollUpPercentilePositionTrigger = 2;
+
+  @Input()
+  public scrollDownPercentilePositionTrigger = 98;
 
   @Output()
   public onScrollUp: EventEmitter<null> = new EventEmitter<null>();
 
+  @Output()
+  public onScrollDown: EventEmitter<null> = new EventEmitter<null>();
+
+  public previousScrollTop: number;
+
+  public previousScrollHeight: number;
+
+  public scrollStreamActive: boolean;
+
+  private initMode: boolean;
+
+  private domMutationObserver: MutationObserver;
+
+  private domMutationEmitter: Subject<MutationRecord[]>;
+
   private scrollChanged: Observable<Event>;
 
-  private get scrollPositionChanged(): Observable<ScrollPosition[]> {
+  private get scrollPairChanged(): Observable<ScrollPosition[]> {
     if (this.scrollChanged) {
       return this.scrollChanged
         .takeWhile(() => this.scrollStreamActive)
@@ -59,71 +86,45 @@ export class NgxInfiniteScrollerDirective implements AfterViewInit, OnInit, OnDe
             scrollHeight: e.target.scrollHeight,
             scrollTop: e.target.scrollTop,
             clientHeight: e.target.clientHeight,
-          }
+          };
         })
         .pairwise()
-        .debounceTime(this.scrollbarAnimationInterval)
+        .debounceTime(this.scrollbarAnimationInterval);
     }
   }
 
-  private get scrollDownChanged(): Observable<ScrollPosition[]> {
-    return this.scrollPositionChanged
-      .filter((scrollPositions: ScrollPosition[]) => {
-        return NgxInfiniteScrollerUtil.wasScrolledDown(
-          scrollPositions[0],
-          scrollPositions[1]
-        );
-      });
+  private get scrollDirectionChanged(): Observable<ScrollPosition[]> {
+    return this.scrollingStrategy.scrollDirectionChanged(this.scrollPairChanged);
   }
 
-  private get scrollUpChanged(): Observable<ScrollPosition[]> {
-    return this.scrollPositionChanged
-      .filter((scrollPositions: ScrollPosition[]) => {
-        return NgxInfiniteScrollerUtil.wasScrolledUp(
-          scrollPositions[0],
-          scrollPositions[1]
-        );
-      });
-  }
-
-  private get scrollRequestZoneEntered(): Observable<ScrollPosition[]> {
-    return this.scrollUpChanged
-      .filter((scrollPositions: ScrollPosition[]) => {
-        return NgxInfiniteScrollerUtil.isScrollUpEnough(
-          scrollPositions[0],
-          this.scrollUpPercentilePositionTrigger
-        );
-      })
-  }
-
-  private get requestDispatcher(): Observable<ScrollPosition[]> {
-    return this.scrollRequestZoneEntered
+  private get scrollRequestZoneChanged(): Observable<ScrollPosition[]> {
+    return this.scrollingStrategy.scrollRequestZoneChanged(this.scrollDirectionChanged)
       .do(() => {
         this.previousScrollTop = this.el.nativeElement.scrollTop;
         this.previousScrollHeight = this.el.nativeElement.scrollHeight;
-      })
-      .startWith([initialScrollPosition, initialScrollPosition]);
+      });
   }
 
-  private previousScrollTop: number;
-
-  private previousScrollHeight: number;
-
-  private domMutationObserver: MutationObserver;
-
-  private domMutationEmitter: Subject<MutationRecord[]>;
-
-  private scrollStreamActive: boolean;
-
-  private initMode: boolean;
-
   constructor(
-    private el: ElementRef,
-    private renderer: Renderer2,
-    private zone: NgZone
-  ) { }
+    el: ElementRef,
+    renderer: Renderer2
+  ) {
+    super(el, renderer);
+  }
 
   public ngOnInit(): void {
+    switch (this.strategy) {
+      case 'scrollingToBoth':
+        this.scrollingStrategy = new ScrollingToBoth(this);
+        break;
+      case 'scrollingToTop':
+        this.scrollingStrategy = new ScrollingToTop(this);
+        break;
+      case 'scrollingToBottom': default:
+        this.scrollingStrategy = new ScrollingToBottom(this);
+        break;
+    }
+
     this.domMutationEmitter = new Subject<MutationRecord[]>();
 
     this.initMode = true;
@@ -132,24 +133,20 @@ export class NgxInfiniteScrollerDirective implements AfterViewInit, OnInit, OnDe
     this.registerScrollEventHandler();
     this.registerMutationObserver();
     this.registerInitialScrollPostionHandler();
-    this.registerRequestScrollPositionHandler();
+    this.registerPreviousScrollPositionHandler();
   }
 
   public ngAfterViewInit(): void {
-    this.registerRequestDispatcher();
+    this.registerScrollSpy();
   }
 
   public ngOnDestroy(): void {
     this.domMutationObserver.disconnect();
   }
 
-  public scrollTo(scrollTop?: number): void {
+  public scrollTo(position: number): void {
     this.scrollStreamActive = false;
-    this.renderer.setProperty(
-      this.el.nativeElement,
-      'scrollTop',
-      scrollTop || this.el.nativeElement.scrollHeight
-    );
+    this.renderer.setProperty(this.el.nativeElement, 'scrollTop', position);
     this.scrollStreamActive = true;
   }
 
@@ -170,28 +167,26 @@ export class NgxInfiniteScrollerDirective implements AfterViewInit, OnInit, OnDe
   private registerInitialScrollPostionHandler(): void {
     this.domMutationEmitter
       .takeWhile(() => this.initMode)
-      .debounceTime(this.scrollDebounceTimeAfterDOMMutation)
+      .debounceTime(this.scrollDebounceTimeAfterDOMMutationOnInit)
       .subscribe(() => {
-        this.scrollTo();
+        this.scrollingStrategy.setInitialScrollPosition();
         this.initMode = false;
       });
   }
 
-  private registerRequestScrollPositionHandler(): void {
+  private registerPreviousScrollPositionHandler(): void {
     Observable
-      .zip(this.requestDispatcher, this.domMutationEmitter)
+      .zip(this.scrollRequestZoneChanged, this.domMutationEmitter)
       .skipWhile(() => this.initMode)
       .debounceTime(this.scrollDebounceTimeAfterDOMMutation)
       .subscribe(() => {
-        const newScrollPosition = this.previousScrollTop +
-          (this.el.nativeElement.scrollHeight - this.previousScrollHeight);
-        this.scrollTo(newScrollPosition);
+        this.scrollingStrategy.setPreviousScrollPosition();
       });
   }
 
-  private registerRequestDispatcher(): void {
-    this.requestDispatcher.subscribe(() => {
-      this.onScrollUp.next();
+  private registerScrollSpy(): void {
+    this.scrollRequestZoneChanged.subscribe(() => {
+      this.scrollingStrategy.askForUpdate();
     });
   }
 }

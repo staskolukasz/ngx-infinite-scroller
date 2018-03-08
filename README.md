@@ -1,12 +1,14 @@
 # ngx-infinite-scroller
 
-Infinite reverse scroll directive for Angular 5
+Infinite and bidirectional scroll directive for Angular 5
 
 ## Installation
 
 Run `npm install ngx-infinite-scroller --save` to install the library.
 
 ## Usage
+
+### *.module.ts configuration
 
 Include `NgxInfiniteScrollerModule` in your module
 
@@ -23,43 +25,34 @@ import { NgxInfiniteScrollerModule } from 'ngx-infinite-scroller';
 })
 ```
 
+### *.component.html configuration
+
 Include `ngxInfiniteScroller` directive in your `*.component.html` file
 
 ```html
 <ul id="scroller"
     ngxInfiniteScroller
-    (onScrollUp)="onScrollUp()">
+    strategy="scrollingToBoth"
+    (onScrollUp)="onScrollUp()"
+    (onScrollDown)="onScrollDown()">
   <li class="news"
       *ngFor="let item of news">
     {{item.title}}
   </li>
 </ul>
 ```
+By default directive works as infinite scroll from the top to the bottom of your list. To switch to other modes, use input parameters like  
+`strategy="scrollingToTop"`  
+`strategy="scrollingToBottom"` (default)  
+`strategy="scrollingToBoth"`
 
-Add some styling in your `*.component.scss` file
+### *.component.ts configuration
 
-```scss
-#scroller {
-  height: 500px;
-  width: 700px;
-  border: 1px solid red;
-  overflow: scroll;
-  padding: 0;
-  list-style: none;
-}
-
-.news {
-  padding: 30px;
-}
-```
-
-Handle `onScrollUp` action in your `*.component.ts` file
+Handle `onScrollUp` and `onScrollDown` actions in your `*.component.ts` file
 
 ```typescript
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
-import { Subject } from 'rxjs/Subject';
 
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/skipWhile';
@@ -79,22 +72,60 @@ export class AppComponent implements OnInit {
 
   constructor(private http: HttpClient) { }
 
-  public ngOnInit() { }
-
-  public onScrollUp(): void {
-    this.getNews(this.currentPage)
-      .skipWhile(() => this.httpReqestInProgress)
-      .do(() => { this.httpReqestInProgress = true })
-      .subscribe((news) => {
-        this.currentPage++;
+  public ngOnInit() {
+    this.getNews(
+      this.currentPage,
+      (news) => {
         this.news = this.news.concat(news);
-        this.httpReqestInProgress = false;
       });
   }
 
-  private getNews(page: number = 1) {
-    return this.http.get(`https://node-hnapi.herokuapp.com/news?page=${page}`);
+  public onScrollUp(): void {
+    this.getNews(
+      this.currentPage,
+      (news) => {
+        this.news = news.concat(this.news);
+      });
   }
+
+  public onScrollDown(): void {
+    this.getNews(
+      this.currentPage,
+      (news) => {
+        this.news = this.news.concat(news);
+      });
+  }
+
+  private getNews(page: number = 1, saveResultsCallback: (news) => void) {
+    return this.http.get(`https://node-hnapi.herokuapp.com/news?page=${page}`)
+      .skipWhile(() => this.httpReqestInProgress)
+      .do(() => { this.httpReqestInProgress = true; })
+      .subscribe((news: any[]) => {
+        this.currentPage++;
+        saveResultsCallback(news);
+        this.httpReqestInProgress = false;
+      });
+  }
+}
+
+```
+
+### *.component.scss configuration
+
+Add some styling in your `*.component.scss` file
+
+```scss
+#scroller {
+  height: 100vh;
+  width: 700px;
+  overflow: scroll;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.news {
+  padding: 30px;
 }
 ```
 
