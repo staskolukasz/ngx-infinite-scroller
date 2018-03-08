@@ -8,6 +8,8 @@ Run `npm install ngx-infinite-scroller --save` to install the library.
 
 ## Usage
 
+### *.module.ts configuration
+
 Include `NgxInfiniteScrollerModule` in your module
 
 ```typescript
@@ -22,6 +24,8 @@ import { NgxInfiniteScrollerModule } from 'ngx-infinite-scroller';
   bootstrap: []
 })
 ```
+
+### *.component.html configuration
 
 Include `ngxInfiniteScroller` directive in your `*.component.html` file
 
@@ -42,22 +46,7 @@ By default directive works as infinite scroll from the top to the bottom of your
 `strategy="scrollingToBottom"` (default)  
 `strategy="scrollingToBoth"`
 
-Add some styling to your `*.component.scss` file
-
-```scss
-#scroller {
-  height: 100vh;
-  width: 700px;
-  overflow: scroll;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.news {
-  padding: 30px;
-}
-```
+### *.component.ts configuration
 
 Handle `onScrollUp` and `onScrollDown` actions in your `*.component.ts` file
 
@@ -121,6 +110,25 @@ export class AppComponent implements OnInit {
   }
 }
 
+```
+
+### *.component.scss configuration
+
+Add some styling to your `*.component.scss` file
+
+```scss
+#scroller {
+  height: 100vh;
+  width: 700px;
+  overflow: scroll;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.news {
+  padding: 30px;
+}
 ```
 
 ## Development environment
