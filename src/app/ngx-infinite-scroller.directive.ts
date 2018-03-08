@@ -49,7 +49,7 @@ export class NgxInfiniteScrollerDirective
   public scrollDebounceTimeAfterDOMMutation = 100;
 
   @Input()
-  public scrollDebounceTimeAfterDOMMutationOnInit = 500;
+  public scrollDebounceTimeAfterDOMMutationOnInit = 1000;
 
   @Input()
   public scrollUpPercentilePositionTrigger = 2;
