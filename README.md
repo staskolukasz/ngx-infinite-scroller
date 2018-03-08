@@ -30,16 +30,16 @@ Include `ngxInfiniteScroller` directive in your `*.component.html` file
     ngxInfiniteScroller
     strategy="scrollingToBoth"
     (onScrollUp)="onScrollUp()"
-    (onScrollUp)="onScrollDown()">
+    (onScrollDown)="onScrollDown()">
   <li class="news"
       *ngFor="let item of news">
     {{item.title}}
   </li>
 </ul>
 ```
-By default directive works as infinite scroll from top to the bottom of the list. To switch to other modes, use input parameters like
-`strategy="scrollingToTop"`
-`strategy="scrollingToBottom"` (default)
+By default directive works as infinite scroll from the top to the bottom of your list. To switch to other modes, use input parameters like  
+`strategy="scrollingToTop"`  
+`strategy="scrollingToBottom"` (default)  
 `strategy="scrollingToBoth"`
 
 Remeber that you should also handle actions like
