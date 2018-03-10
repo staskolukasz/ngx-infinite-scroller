@@ -2,7 +2,7 @@
 
 Infinite and bidirectional scroll directive for Angular 5
 
-All notable changes to this project are documented in CHANGELOG.md file.
+All notable changes to this project are documented in [CHANGELOG.md](https://github.com/staskolukasz/ngx-infinite-scroller/blob/master/CHANGELOG.md) file.
 
 ## Installation
 
