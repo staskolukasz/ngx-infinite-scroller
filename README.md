@@ -2,6 +2,8 @@
 
 Infinite and bidirectional scroll directive for Angular 5
 
+All notable changes to this project are documented in CHANGELOG.md file.
+
 ## Installation
 
 Run `npm install ngx-infinite-scroller --save` to install the library.
