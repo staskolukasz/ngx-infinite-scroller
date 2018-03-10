@@ -1,4 +1,4 @@
-import { ScrollPosition } from './../model/scroll-position.model';
+import { ScrollPosition } from '../model/scroll-position.model';
 
 export class Utils {
   public static wasScrolledDown(prevPos: ScrollPosition, currentPos: ScrollPosition): boolean {

@@ -1,17 +1,17 @@
 import { Observable } from 'rxjs/Observable';
 import { NgxInfiniteScrollerDirective } from '../ngx-infinite-scroller.directive';
+import { DirectiveStateService } from '../directive-state.service';
 
 import { Utils } from './utils';
-import { ScrollingStrategy } from './scrolling-strategy';
-import { ScrollPosition } from './../model/scroll-position.model';
+import { ScrollingStrategy } from '../model/scrolling-strategy.model';
+import { ScrollPosition } from '../model/scroll-position.model';
 
 export class ScrollingToBottom implements ScrollingStrategy {
 
-  private directive: NgxInfiniteScrollerDirective;
-
-  constructor(directive: NgxInfiniteScrollerDirective) {
-    this.directive = directive;
-  }
+  constructor(
+    private directive: NgxInfiniteScrollerDirective,
+    private state: DirectiveStateService
+  ) { }
 
   public scrollDirectionChanged(scrollPairChanged: Observable<ScrollPosition[]>):
     Observable<ScrollPosition[]> {
@@ -44,7 +44,7 @@ export class ScrollingToBottom implements ScrollingStrategy {
   }
 
   public setPreviousScrollPosition(): void {
-    const prevScrollPosition = this.directive.previousScrollTop;
+    const prevScrollPosition = this.state.previousScrollTop;
     this.directive.scrollTo(prevScrollPosition);
   }
 }

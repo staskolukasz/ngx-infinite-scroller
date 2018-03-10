@@ -1,19 +1,19 @@
 import { Observable } from 'rxjs/Observable';
 import { NgxInfiniteScrollerDirective } from '../ngx-infinite-scroller.directive';
+import { DirectiveStateService } from '../directive-state.service';
 
 import { Utils } from './utils';
-import { ScrollingStrategy } from './scrolling-strategy';
-import { ScrollPosition } from './../model/scroll-position.model';
+import { ScrollingStrategy } from '../model/scrolling-strategy.model';
+import { ScrollPosition } from '../model/scroll-position.model';
 
 export class ScrollingToBoth implements ScrollingStrategy {
 
-  private directive: NgxInfiniteScrollerDirective;
-
   private scrolledUp: boolean;
 
-  constructor(directive: NgxInfiniteScrollerDirective) {
-    this.directive = directive;
-  }
+  constructor(
+    private directive: NgxInfiniteScrollerDirective,
+    private state: DirectiveStateService
+  ) { }
 
   public scrollDirectionChanged(scrollPairChanged: Observable<ScrollPosition[]>):
     Observable<ScrollPosition[]> {
@@ -48,17 +48,17 @@ export class ScrollingToBoth implements ScrollingStrategy {
   }
 
   public setInitialScrollPosition(): void {
-    this.directive.scrollTo(this.directive.el.nativeElement.scrollHeight / 2 - this.directive.el.nativeElement.clientHeight / 2);
+    this.directive.scrollTo(this.state.scrollHeight / 2 - this.state.clientHeight / 2);
   }
 
   public setPreviousScrollPosition(): void {
     let prevScrollPosition;
 
     if (this.scrolledUp) {
-      prevScrollPosition = this.directive.previousScrollTop +
-        (this.directive.el.nativeElement.scrollHeight - this.directive.previousScrollHeight);
+      prevScrollPosition = this.state.previousScrollTop +
+        (this.state.scrollHeight - this.state.previousScrollHeight);
     } else {
-      prevScrollPosition = this.directive.previousScrollTop;
+      prevScrollPosition = this.state.previousScrollTop;
     }
 
     this.directive.scrollTo(prevScrollPosition);

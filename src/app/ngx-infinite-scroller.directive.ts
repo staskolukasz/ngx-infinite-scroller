@@ -25,12 +25,16 @@ import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/skipWhile';
 import 'rxjs/add/operator/debounceTime';
 
+import { DirectiveStateService } from './directive-state.service';
+
 import { ScrollPosition } from './model/scroll-position.model';
 
-import { DirectiveContext } from './implementation/directive-context';
-import { ScrollingToTop } from './implementation/scrolling-to-top';
-import { ScrollingToBottom } from './implementation/scrolling-to-bottom';
-import { ScrollingToBoth } from './implementation/scrolling-to-both';
+import { DirectiveContext } from './directive-context';
+import { ScrollingToTop } from './scrolling-strategy/scrolling-to-top';
+import { ScrollingToBottom } from './scrolling-strategy/scrolling-to-bottom';
+import { ScrollingToBoth } from './scrolling-strategy/scrolling-to-both';
+
+import { ScrollHeightListener } from './scroll-height-listener/scroll-height-listener';
 
 @Directive({
   selector: '[ngxInfiniteScroller]'
@@ -46,7 +50,7 @@ export class NgxInfiniteScrollerDirective
   public scrollbarAnimationInterval = 100;
 
   @Input()
-  public scrollDebounceTimeAfterDOMMutation = 100;
+  public scrollDebounceTimeAfterScrollHeightChanged = 50;
 
   @Input()
   public scrollDebounceTimeAfterDOMMutationOnInit = 1000;
@@ -63,24 +67,20 @@ export class NgxInfiniteScrollerDirective
   @Output()
   public onScrollDown: EventEmitter<null> = new EventEmitter<null>();
 
-  public previousScrollTop: number;
+  private scrollHeightListener: ScrollHeightListener;
 
-  public previousScrollHeight: number;
-
-  public scrollStreamActive: boolean;
-
-  private initMode: boolean;
+  private scrollHeightChanged: Subject<null> = new Subject<null>();
 
   private domMutationObserver: MutationObserver;
 
-  private domMutationEmitter: Subject<MutationRecord[]>;
+  private domMutationEmitter: Subject<MutationRecord[]> = new Subject<MutationRecord[]>();
 
   private scrollChanged: Observable<Event>;
 
   private get scrollPairChanged(): Observable<ScrollPosition[]> {
     if (this.scrollChanged) {
       return this.scrollChanged
-        .takeWhile(() => this.scrollStreamActive)
+        .takeWhile(() => this.state.scrollStreamActive)
         .map((e: any) => {
           return <ScrollPosition>{
             scrollHeight: e.target.scrollHeight,
@@ -100,35 +100,30 @@ export class NgxInfiniteScrollerDirective
   private get scrollRequestZoneChanged(): Observable<ScrollPosition[]> {
     return this.scrollingStrategy.scrollRequestZoneChanged(this.scrollDirectionChanged)
       .do(() => {
-        this.previousScrollTop = this.el.nativeElement.scrollTop;
-        this.previousScrollHeight = this.el.nativeElement.scrollHeight;
+        this.state.updatePreviousScrollTop();
+        this.state.updatePreviousScrollHeight();
+        this.state.previousScrollPositionpUpdated = false;
+        this.scrollHeightListener.start();
       });
   }
 
   constructor(
-    el: ElementRef,
-    renderer: Renderer2
+    private el: ElementRef,
+    private renderer: Renderer2,
+    private state: DirectiveStateService
   ) {
-    super(el, renderer);
+    super();
+    this.state.setup({
+      el: el,
+      initMode: true,
+      scrollStreamActive: true,
+      previousScrollPositionpUpdated: false
+    });
   }
 
   public ngOnInit(): void {
-    switch (this.strategy) {
-      case 'scrollingToBoth':
-        this.scrollingStrategy = new ScrollingToBoth(this);
-        break;
-      case 'scrollingToTop':
-        this.scrollingStrategy = new ScrollingToTop(this);
-        break;
-      case 'scrollingToBottom': default:
-        this.scrollingStrategy = new ScrollingToBottom(this);
-        break;
-    }
-
-    this.domMutationEmitter = new Subject<MutationRecord[]>();
-
-    this.initMode = true;
-    this.scrollStreamActive = false;
+    this.useStrategy();
+    this.useScrollHeightListener();
 
     this.registerScrollEventHandler();
     this.registerMutationObserver();
@@ -145,9 +140,13 @@ export class NgxInfiniteScrollerDirective
   }
 
   public scrollTo(position: number): void {
-    this.scrollStreamActive = false;
+    this.state.scrollStreamActive = false;
     this.renderer.setProperty(this.el.nativeElement, 'scrollTop', position);
-    this.scrollStreamActive = true;
+    this.state.scrollStreamActive = true;
+  }
+
+  public onScrollbarHeightChanged(): void {
+    this.scrollHeightChanged.next();
   }
 
   private registerScrollEventHandler(): void {
@@ -166,21 +165,25 @@ export class NgxInfiniteScrollerDirective
 
   private registerInitialScrollPostionHandler(): void {
     this.domMutationEmitter
-      .takeWhile(() => this.initMode)
+      .takeWhile(() => this.state.initMode)
       .debounceTime(this.scrollDebounceTimeAfterDOMMutationOnInit)
       .subscribe(() => {
         this.scrollingStrategy.setInitialScrollPosition();
-        this.initMode = false;
+        this.state.initMode = false;
       });
   }
 
   private registerPreviousScrollPositionHandler(): void {
     Observable
-      .zip(this.scrollRequestZoneChanged, this.domMutationEmitter)
-      .skipWhile(() => this.initMode)
-      .debounceTime(this.scrollDebounceTimeAfterDOMMutation)
+      .zip(
+        this.scrollRequestZoneChanged,
+        this.scrollHeightChanged
+      )
+      .skipWhile(() => this.state.initMode)
+      .debounceTime(this.scrollDebounceTimeAfterScrollHeightChanged)
       .subscribe(() => {
         this.scrollingStrategy.setPreviousScrollPosition();
+        this.state.previousScrollPositionpUpdated = true;
       });
   }
 
@@ -188,5 +191,23 @@ export class NgxInfiniteScrollerDirective
     this.scrollRequestZoneChanged.subscribe(() => {
       this.scrollingStrategy.askForUpdate();
     });
+  }
+
+  private useStrategy(): void {
+    switch (this.strategy) {
+      case 'scrollingToBoth':
+        this.scrollingStrategy = new ScrollingToBoth(this, this.state);
+        break;
+      case 'scrollingToTop':
+        this.scrollingStrategy = new ScrollingToTop(this, this.state);
+        break;
+      case 'scrollingToBottom': default:
+        this.scrollingStrategy = new ScrollingToBottom(this, this.state);
+        break;
+    }
+  }
+
+  private useScrollHeightListener(): void {
+    this.scrollHeightListener = new ScrollHeightListener(this, this.state);
   }
 }
