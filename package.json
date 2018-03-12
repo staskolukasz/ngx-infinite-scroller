@@ -1,6 +1,6 @@
 {
   "name": "ngx-infinite-scroller",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Infinite bidirectional scroll directive for Angular 5",
   "scripts": {
     "ng": "ng",
