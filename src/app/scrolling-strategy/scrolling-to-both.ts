@@ -1,4 +1,6 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
+import { tap, filter } from 'rxjs/operators';
+
 import { NgxInfiniteScrollerDirective } from '../ngx-infinite-scroller.directive';
 import { DirectiveStateService } from '../directive-state.service';
 
@@ -22,8 +24,8 @@ export class ScrollingToBoth implements ScrollingStrategy {
 
   public scrollRequestZoneChanged(scrollDirectionChanged: Observable<ScrollPosition[]>):
     Observable<ScrollPosition[]> {
-    return scrollDirectionChanged
-      .filter((scrollPositions: ScrollPosition[]) => {
+    return scrollDirectionChanged.pipe(
+      filter((scrollPositions: ScrollPosition[]) => {
         return (Utils.isScrollUpEnough(
           scrollPositions[1],
           this.directive.scrollUpPercentilePositionTrigger
@@ -31,12 +33,13 @@ export class ScrollingToBoth implements ScrollingStrategy {
           scrollPositions[1],
           this.directive.scrollDownPercentilePositionTrigger
         ));
-      })
-      .do((scrollPositions: ScrollPosition[]) => {
+      }),
+      tap((scrollPositions: ScrollPosition[]) => {
         this.scrolledUp = Utils.wasScrolledUp(
           scrollPositions[0],
           scrollPositions[1]);
-      });
+      })
+    );
   }
 
   public askForUpdate(): void {
