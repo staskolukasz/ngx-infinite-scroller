@@ -29,3 +29,6 @@ yarn-error.log
 
 # rollup-test output
 /modules/rollup-test/dist/
+
+# tgz files
+*.tgz
