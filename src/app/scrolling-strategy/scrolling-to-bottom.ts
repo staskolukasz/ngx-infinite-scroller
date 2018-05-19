@@ -1,4 +1,6 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
+
 import { NgxInfiniteScrollerDirective } from '../ngx-infinite-scroller.directive';
 import { DirectiveStateService } from '../directive-state.service';
 
@@ -15,24 +17,26 @@ export class ScrollingToBottom implements ScrollingStrategy {
 
   public scrollDirectionChanged(scrollPairChanged: Observable<ScrollPosition[]>):
     Observable<ScrollPosition[]> {
-    return scrollPairChanged
-      .filter((scrollPositions: ScrollPosition[]) => {
+    return scrollPairChanged.pipe(
+      filter((scrollPositions: ScrollPosition[]) => {
         return Utils.wasScrolledDown(
           scrollPositions[0],
           scrollPositions[1]
         );
-      });
+      })
+    );
   }
 
   public scrollRequestZoneChanged(scrollDirectionChanged: Observable<ScrollPosition[]>):
     Observable<ScrollPosition[]> {
-    return scrollDirectionChanged
-      .filter((scrollPositions: ScrollPosition[]) => {
+    return scrollDirectionChanged.pipe(
+      filter((scrollPositions: ScrollPosition[]) => {
         return Utils.isScrollDownEnough(
           scrollPositions[1],
           this.directive.scrollDownPercentilePositionTrigger
         );
-      });
+      })
+    );
   }
 
   public askForUpdate(): void {

@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ScrollPosition } from '../model/scroll-position.model';
 
 export interface ScrollingStrategy {

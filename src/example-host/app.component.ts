@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/skipWhile';
+import { tap, skipWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -44,10 +43,10 @@ export class AppComponent implements OnInit {
   }
 
   private getNews(page: number = 1, saveResultsCallback: (news) => void) {
-    return this.http.get(`https://node-hnapi.herokuapp.com/news?page=${page}`)
-      .skipWhile(() => this.httpReqestInProgress)
-      .do(() => { this.httpReqestInProgress = true; })
-      .subscribe((news: any[]) => {
+    return this.http.get(`https://node-hnapi.herokuapp.com/news?page=${page}`).pipe(
+      skipWhile(() => this.httpReqestInProgress),
+      tap(() => { this.httpReqestInProgress = true; })
+    ).subscribe((news: any[]) => {
         this.currentPage++;
         saveResultsCallback(news);
         this.httpReqestInProgress = false;
