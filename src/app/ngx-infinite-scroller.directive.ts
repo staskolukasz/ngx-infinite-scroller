@@ -10,20 +10,9 @@ import {
   Renderer2,
 } from '@angular/core';
 
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Subject, of, zip, fromEvent } from 'rxjs';
 
-import 'rxjs/add/observable/zip';
-import 'rxjs/add/observable/fromEvent';
-
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/pairwise';
-import 'rxjs/add/operator/startWith';
-import 'rxjs/add/operator/takeWhile';
-import 'rxjs/add/operator/skipWhile';
-import 'rxjs/add/operator/debounceTime';
+import { tap, map, filter, pairwise, startWith, takeWhile, skipWhile, debounceTime } from 'rxjs/operators';
 
 import { DirectiveStateService } from './directive-state.service';
 
@@ -79,17 +68,18 @@ export class NgxInfiniteScrollerDirective
 
   private get scrollPairChanged(): Observable<ScrollPosition[]> {
     if (this.scrollChanged) {
-      return this.scrollChanged
-        .takeWhile(() => this.state.scrollStreamActive)
-        .map((e: any) => {
+      return this.scrollChanged.pipe(
+        takeWhile(() => this.state.scrollStreamActive),
+        map((e: any) => {
           return <ScrollPosition>{
             scrollHeight: e.target.scrollHeight,
             scrollTop: e.target.scrollTop,
             clientHeight: e.target.clientHeight,
           };
-        })
-        .pairwise()
-        .debounceTime(this.scrollbarAnimationInterval);
+        }),
+        pairwise(),
+        debounceTime(this.scrollbarAnimationInterval)
+      );
     }
   }
 
@@ -98,13 +88,14 @@ export class NgxInfiniteScrollerDirective
   }
 
   private get scrollRequestZoneChanged(): Observable<ScrollPosition[]> {
-    return this.scrollingStrategy.scrollRequestZoneChanged(this.scrollDirectionChanged)
-      .do(() => {
+    return this.scrollingStrategy.scrollRequestZoneChanged(this.scrollDirectionChanged).pipe(
+      tap(() => {
         this.state.updatePreviousScrollTop();
         this.state.updatePreviousScrollHeight();
         this.state.previousScrollPositionpUpdated = false;
         this.scrollHeightListener.start();
-      });
+      })
+    );
   }
 
   constructor(
@@ -150,7 +141,7 @@ export class NgxInfiniteScrollerDirective
   }
 
   private registerScrollEventHandler(): void {
-    this.scrollChanged = Observable.fromEvent(this.el.nativeElement, 'scroll');
+    this.scrollChanged = fromEvent(this.el.nativeElement, 'scroll');
   }
 
   private registerMutationObserver(): void {
@@ -164,27 +155,26 @@ export class NgxInfiniteScrollerDirective
   }
 
   private registerInitialScrollPostionHandler(): void {
-    this.domMutationEmitter
-      .takeWhile(() => this.state.initMode)
-      .debounceTime(this.scrollDebounceTimeAfterDOMMutationOnInit)
-      .subscribe(() => {
-        this.scrollingStrategy.setInitialScrollPosition();
-        this.state.initMode = false;
-      });
+    this.domMutationEmitter.pipe(
+      takeWhile(() => this.state.initMode),
+      debounceTime(this.scrollDebounceTimeAfterDOMMutationOnInit)
+    ).subscribe(() => {
+      this.scrollingStrategy.setInitialScrollPosition();
+      this.state.initMode = false;
+    });
   }
 
   private registerPreviousScrollPositionHandler(): void {
-    Observable
-      .zip(
-        this.scrollRequestZoneChanged,
-        this.scrollHeightChanged
-      )
-      .skipWhile(() => this.state.initMode)
-      .debounceTime(this.scrollDebounceTimeAfterScrollHeightChanged)
-      .subscribe(() => {
-        this.scrollingStrategy.setPreviousScrollPosition();
-        this.state.previousScrollPositionpUpdated = true;
-      });
+    zip(
+      this.scrollRequestZoneChanged,
+      this.scrollHeightChanged
+    ).pipe(
+      skipWhile(() => this.state.initMode),
+      debounceTime(this.scrollDebounceTimeAfterScrollHeightChanged)
+    ).subscribe(() => {
+      this.scrollingStrategy.setPreviousScrollPosition();
+      this.state.previousScrollPositionpUpdated = true;
+    });
   }
 
   private registerScrollSpy(): void {
