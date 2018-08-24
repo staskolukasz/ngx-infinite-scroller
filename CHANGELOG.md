@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.3.5] - 2018-08-24
 ### Changed
 - Readme.md updated (new rxjs syntax)
+- NPM packages updated
 
 ## [0.3.4] - 2018-05-19
 ### Changed
