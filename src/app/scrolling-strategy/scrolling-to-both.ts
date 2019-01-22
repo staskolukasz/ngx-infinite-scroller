@@ -1,23 +1,24 @@
 import { Observable } from 'rxjs';
 import { tap, filter } from 'rxjs/operators';
 
-import { StrategyHelper } from './strategy-helper';
+import { StrategyBase } from './strategy-base';
 
 import { NgxInfiniteScrollerDirective } from '../ngx-infinite-scroller.directive';
 import { DirectiveStateService } from '../directive-state.service';
 
 import { ScrollingStrategy } from '../model/scrolling-strategy.model';
 import { ScrollPosition } from '../model/scroll-position.model';
+import { InitialScrollPosition } from '../enum/initial-scroll-position-type.enum';
 
-export class ScrollingToBoth extends StrategyHelper implements ScrollingStrategy {
+export class ScrollingToBoth extends StrategyBase implements ScrollingStrategy {
 
   private scrolledUp: boolean;
 
   constructor(
-    private directive: NgxInfiniteScrollerDirective,
-    private state: DirectiveStateService
+    directive: NgxInfiniteScrollerDirective,
+    state: DirectiveStateService
   ) {
-    super();
+    super(directive, state);
   }
 
   public scrollDirectionChanged(scrollPairChanged: Observable<ScrollPosition[]>):
@@ -54,7 +55,11 @@ export class ScrollingToBoth extends StrategyHelper implements ScrollingStrategy
   }
 
   public setInitialScrollPosition(): void {
-    this.directive.scrollTo(this.state.scrollHeight / 2 - this.state.clientHeight / 2);
+    const initialScrollPositionValue = super.getInitialScrollPositionValue(
+      InitialScrollPosition.MIDDLE,
+    );
+
+    this.directive.scrollTo(initialScrollPositionValue);
   }
 
   public setPreviousScrollPosition(): void {
