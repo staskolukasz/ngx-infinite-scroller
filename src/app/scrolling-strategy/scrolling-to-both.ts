@@ -1,21 +1,24 @@
 import { Observable } from 'rxjs';
 import { tap, filter } from 'rxjs/operators';
 
+import { StrategyHelper } from './strategy-helper';
+
 import { NgxInfiniteScrollerDirective } from '../ngx-infinite-scroller.directive';
 import { DirectiveStateService } from '../directive-state.service';
 
-import { Utils } from './utils';
 import { ScrollingStrategy } from '../model/scrolling-strategy.model';
 import { ScrollPosition } from '../model/scroll-position.model';
 
-export class ScrollingToBoth implements ScrollingStrategy {
+export class ScrollingToBoth extends StrategyHelper implements ScrollingStrategy {
 
   private scrolledUp: boolean;
 
   constructor(
     private directive: NgxInfiniteScrollerDirective,
     private state: DirectiveStateService
-  ) { }
+  ) {
+    super();
+  }
 
   public scrollDirectionChanged(scrollPairChanged: Observable<ScrollPosition[]>):
     Observable<ScrollPosition[]> {
@@ -26,16 +29,16 @@ export class ScrollingToBoth implements ScrollingStrategy {
     Observable<ScrollPosition[]> {
     return scrollDirectionChanged.pipe(
       filter((scrollPositions: ScrollPosition[]) => {
-        return (Utils.isScrollUpEnough(
+        return (super.isScrollUpEnough(
           scrollPositions[1],
           this.directive.scrollUpPercentilePositionTrigger
-        ) || Utils.isScrollDownEnough(
+        ) || super.isScrollDownEnough(
           scrollPositions[1],
           this.directive.scrollDownPercentilePositionTrigger
         ));
       }),
       tap((scrollPositions: ScrollPosition[]) => {
-        this.scrolledUp = Utils.wasScrolledUp(
+        this.scrolledUp = super.wasScrolledUp(
           scrollPositions[0],
           scrollPositions[1]);
       })
