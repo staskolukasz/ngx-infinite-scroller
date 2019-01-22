@@ -1,4 +1,4 @@
-import * as isNumber from 'is-number';
+import isNumber from 'is-number';
 
 import { NgxInfiniteScrollerDirective } from '../ngx-infinite-scroller.directive';
 import { DirectiveStateService } from '../directive-state.service';
