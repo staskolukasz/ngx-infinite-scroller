@@ -1,21 +1,25 @@
 import { Observable } from 'rxjs';
 import { tap, filter } from 'rxjs/operators';
 
+import { StrategyBase } from './strategy-base';
+
 import { NgxInfiniteScrollerDirective } from '../ngx-infinite-scroller.directive';
 import { DirectiveStateService } from '../directive-state.service';
 
-import { Utils } from './utils';
 import { ScrollingStrategy } from '../model/scrolling-strategy.model';
 import { ScrollPosition } from '../model/scroll-position.model';
+import { InitialScrollPosition } from '../enum/initial-scroll-position-type.enum';
 
-export class ScrollingToBoth implements ScrollingStrategy {
+export class ScrollingToBoth extends StrategyBase implements ScrollingStrategy {
 
   private scrolledUp: boolean;
 
   constructor(
-    private directive: NgxInfiniteScrollerDirective,
-    private state: DirectiveStateService
-  ) { }
+    directive: NgxInfiniteScrollerDirective,
+    state: DirectiveStateService
+  ) {
+    super(directive, state);
+  }
 
   public scrollDirectionChanged(scrollPairChanged: Observable<ScrollPosition[]>):
     Observable<ScrollPosition[]> {
@@ -26,16 +30,16 @@ export class ScrollingToBoth implements ScrollingStrategy {
     Observable<ScrollPosition[]> {
     return scrollDirectionChanged.pipe(
       filter((scrollPositions: ScrollPosition[]) => {
-        return (Utils.isScrollUpEnough(
+        return (super.isScrollUpEnough(
           scrollPositions[1],
           this.directive.scrollUpPercentilePositionTrigger
-        ) || Utils.isScrollDownEnough(
+        ) || super.isScrollDownEnough(
           scrollPositions[1],
           this.directive.scrollDownPercentilePositionTrigger
         ));
       }),
       tap((scrollPositions: ScrollPosition[]) => {
-        this.scrolledUp = Utils.wasScrolledUp(
+        this.scrolledUp = super.wasScrolledUp(
           scrollPositions[0],
           scrollPositions[1]);
       })
@@ -51,7 +55,11 @@ export class ScrollingToBoth implements ScrollingStrategy {
   }
 
   public setInitialScrollPosition(): void {
-    this.directive.scrollTo(this.state.scrollHeight / 2 - this.state.clientHeight / 2);
+    const initialScrollPositionValue = super.getInitialScrollPositionValue(
+      InitialScrollPosition.MIDDLE,
+    );
+
+    this.directive.scrollTo(initialScrollPositionValue);
   }
 
   public setPreviousScrollPosition(): void {
