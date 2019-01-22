@@ -10,13 +10,14 @@ import {
   Renderer2,
 } from '@angular/core';
 
-import { Observable, Subject, of, zip, fromEvent } from 'rxjs';
+import { Observable, Subject, zip, fromEvent } from 'rxjs';
 
-import { tap, map, filter, pairwise, startWith, takeWhile, skipWhile, debounceTime } from 'rxjs/operators';
+import { tap, map, pairwise, takeWhile, skipWhile, debounceTime } from 'rxjs/operators';
 
 import { DirectiveStateService } from './directive-state.service';
 
 import { ScrollPosition } from './model/scroll-position.model';
+import { InitialScrollPosition } from './enum/initial-scroll-position-type.enum';
 
 import { DirectiveContext } from './directive-context';
 import { ScrollingToTop } from './scrolling-strategy/scrolling-to-top';
@@ -34,6 +35,9 @@ export class NgxInfiniteScrollerDirective
 
   @Input()
   public strategy: string = 'scrollingToBottom';
+
+  @Input()
+  public initialScrollPosition: InitialScrollPosition | number = InitialScrollPosition.DEFAULT;
 
   @Input()
   public scrollbarAnimationInterval = 100;
