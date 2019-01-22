@@ -1,6 +1,6 @@
 # ngx-infinite-scroller
 
-Infinite and bidirectional scroll directive for Angular 6
+Infinite and bidirectional scroll directive for Angular 7
 
 All notable changes to this project are documented in [CHANGELOG.md](https://github.com/staskolukasz/ngx-infinite-scroller/blob/master/CHANGELOG.md) file.
 
@@ -43,7 +43,7 @@ Include `ngxInfiniteScroller` directive in your `*.component.html` file
   </li>
 </ul>
 ```
-By default directive works as infinite scroll from the top to the bottom of your list. To switch to other modes, use input parameters like  
+By default directive works as infinite scroll from the top to the bottom of your list. To switch to other modes, use input parameters like:
 `strategy="scrollingToTop"`  
 `strategy="scrollingToBottom"` (default)  
 `strategy="scrollingToBoth"`
@@ -53,7 +53,7 @@ Default value of initial scroll position depends on strategy value:
 `strategy="scrollingToBoth"` -> `initialScrollPosition="MIDDLE"`
 `strategy="scrollingToBottom"` -> `initialScrollPosition="TOP"`
 
-However it is possible to use custom values using optional input field `initialScrollPosition` like  
+it is aslo possible to customize the default behaviour using optional input field:  
 `initialScrollPosition="TOP"`  
 `initialScrollPosition="MIDDLE"`   
 `initialScrollPosition="BOTTOM"`  
