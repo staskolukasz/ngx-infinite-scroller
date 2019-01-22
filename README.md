@@ -48,6 +48,17 @@ By default directive works as infinite scroll from the top to the bottom of your
 `strategy="scrollingToBottom"` (default)  
 `strategy="scrollingToBoth"`
 
+Default value of initial scroll position depends on strategy value:
+`strategy="scrollingToTop"` -> `initialScrollPosition="BOTTOM"`
+`strategy="scrollingToBoth"` -> `initialScrollPosition="MIDDLE"`
+`strategy="scrollingToBottom"` -> `initialScrollPosition="TOP"`
+
+However it is possible to use custom values using optional input field `initialScrollPosition` like  
+`initialScrollPosition="TOP"`  
+`initialScrollPosition="MIDDLE"`   
+`initialScrollPosition="BOTTOM"`  
+`initialScrollPosition="50"` (position in px)
+
 ### *.component.ts configuration
 
 Handle `onScrollUp` and `onScrollDown` actions in your `*.component.ts` file
