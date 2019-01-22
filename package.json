@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/ng-packagr/package.schema.json",
   "name": "ngx-infinite-scroller",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "description": "Infinite bidirectional scroll directive for Angular 6",
   "ngPackage": {
     "lib": {
@@ -17,6 +17,7 @@
   "private": false,
   "dependencies": {},
   "devDependencies": {
+    "@angular-devkit/build-angular": "~0.12.2",
     "@angular/animations": "7.2.1",
     "@angular/cli": "7.2.2",
     "@angular/common": "7.2.1",
@@ -32,15 +33,15 @@
     "@types/node": "10.12.18",
     "codelyzer": "4.5.0",
     "core-js": "2.6.3",
+    "is-number": "^7.0.0",
     "ng-packagr": "4.6.0",
     "protractor": "5.4.2",
     "rxjs": "6.3.3",
     "ts-node": "8.0.1",
     "tslint": "5.12.1",
+    "tsickle": "^0.34.0",
     "typescript": "3.2.4",
-    "zone.js": "0.8.28",
-    "@angular-devkit/build-angular": "~0.12.2",
-    "is-number": "^7.0.0"
+    "zone.js": "0.8.28"
   },
   "peerDependencies": {
     "@angular/animations": "7.2.1",
