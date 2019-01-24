@@ -43,17 +43,17 @@ Include `ngxInfiniteScroller` directive in your `*.component.html` file
   </li>
 </ul>
 ```
-By default directive works as infinite scroll from the top to the bottom of your list. To switch to other modes, use input parameters like:  
+By default the directive works as an infinite scroll from the top to the bottom of your list. To switch to other modes, use input parameters like:  
 `strategy="scrollingToTop"`  
 `strategy="scrollingToBottom"` (default)  
 `strategy="scrollingToBoth"`  
 
-Default value of initial scroll position depends on strategy value:  
+Default value of initial scroll position depends on the strategy value:  
 `strategy="scrollingToTop"` -> `initialScrollPosition="BOTTOM"`  
 `strategy="scrollingToBoth"` -> `initialScrollPosition="MIDDLE"`  
 `strategy="scrollingToBottom"` -> `initialScrollPosition="TOP"`  
 
-It is aslo possible to customize the default behaviour using optional input field:  
+It is also possible to customize the default behaviour using an optional input field:  
 `initialScrollPosition="TOP"`  
 `initialScrollPosition="MIDDLE"`  
 `initialScrollPosition="BOTTOM"`  
