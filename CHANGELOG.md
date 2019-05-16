@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.4.2] - 2019-05-15
 ### Changed
-- Fix npm vulnerables
+- Fix npm vulnerables and npm update packages
 
 ## [0.4.1] - 2019-01-22
 ### Changed
