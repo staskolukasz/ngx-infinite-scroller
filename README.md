@@ -146,3 +146,7 @@ Add some styling in your `*.component.scss` file
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 Run `npm run packagr` to build the library. The build artifacts will be stored in the `dist` directory.
+
+## Publishing
+
+Run `cd dist && npm publish` command to publish the package.
