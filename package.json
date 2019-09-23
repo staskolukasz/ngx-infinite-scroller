@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/ng-packagr/package.schema.json",
   "name": "ngx-infinite-scroller",
-  "version": "0.4.5",
+  "version": "0.5.0",
   "description": "Infinite bidirectional scroll directive for Angular 8",
   "ngPackage": {
     "lib": {
