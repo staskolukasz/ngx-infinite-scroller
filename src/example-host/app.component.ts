@@ -52,7 +52,6 @@ export class AppComponent implements OnInit {
     if (this.request$) {
       return this.request$;
     } else {
-      console.log('Strona:', page);
       this.request$ = this.http.get(`https://node-hnapi.herokuapp.com/news?page=${page}`).pipe(share());
       return this.request$;
     }
