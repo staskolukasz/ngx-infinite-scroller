@@ -8,7 +8,11 @@ import {
   Output,
   EventEmitter,
   Renderer2,
+  Inject,
+  PLATFORM_ID,
 } from '@angular/core';
+
+import { isPlatformBrowser } from '@angular/common';
 
 import { Observable, Subject, zip, fromEvent } from 'rxjs';
 
@@ -102,12 +106,17 @@ export class NgxInfiniteScrollerDirective
     );
   }
 
+  private isBrowser: boolean;
+
   constructor(
+    @Inject(PLATFORM_ID)
+    private platformId: any,
     private el: ElementRef,
     private renderer: Renderer2,
     private state: DirectiveStateService
   ) {
     super();
+    this.isBrowser = isPlatformBrowser(platformId);
     this.state.setup({
       el: el,
       initMode: true,
@@ -131,7 +140,7 @@ export class NgxInfiniteScrollerDirective
   }
 
   public ngOnDestroy(): void {
-    this.domMutationObserver.disconnect();
+    this.unregisterMutationObserver();
   }
 
   public scrollTo(position: number): void {
@@ -149,13 +158,15 @@ export class NgxInfiniteScrollerDirective
   }
 
   private registerMutationObserver(): void {
-    this.domMutationObserver = new MutationObserver(
-      (mutations: MutationRecord[]) => {
-        this.domMutationEmitter.next(mutations);
-      });
+    if (this.isBrowser) {
+      this.domMutationObserver = new MutationObserver(
+        (mutations: MutationRecord[]) => {
+          this.domMutationEmitter.next(mutations);
+        });
 
-    const config = { attributes: true, childList: true, characterData: true };
-    this.domMutationObserver.observe(this.el.nativeElement, config);
+      const config = { attributes: true, childList: true, characterData: true };
+      this.domMutationObserver.observe(this.el.nativeElement, config);
+    }
   }
 
   private registerInitialScrollPostionHandler(): void {
@@ -185,6 +196,12 @@ export class NgxInfiniteScrollerDirective
     this.scrollRequestZoneChanged.subscribe(() => {
       this.scrollingStrategy.askForUpdate();
     });
+  }
+
+  private unregisterMutationObserver(): void {
+    if (this.domMutationObserver) {
+      this.domMutationObserver.disconnect();
+    }
   }
 
   private useStrategy(): void {

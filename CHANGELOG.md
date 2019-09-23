@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.5.0] - 2019-09-23
 ### Changed
 - Update to Angular 8
-- Update documentation and sample application to prevent duplicate http requests on scroll event.
+- Update documentation and sample application to prevent duplicate http requests on scroll event
+- In server side rendering mutation observer is not used anymore.
 
 ## [0.4.5] - 2019-07-16
 ### Changed
