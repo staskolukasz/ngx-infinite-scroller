@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { tap, skipWhile } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { share, finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -12,44 +13,52 @@ export class AppComponent implements OnInit {
 
   public news: Array<any> = [];
 
-  public httpReqestInProgress: boolean = false;
-
   private currentPage = 1;
+
+  private request$: Observable<any>;
 
   constructor(private http: HttpClient) { }
 
   public ngOnInit() {
-    this.getNews(
-      this.currentPage,
-      (news) => {
+    this.getNews(this.currentPage)
+      .pipe(finalize(() => this.onFinalize()))
+      .subscribe((news) => {
+        this.currentPage++;
         this.news = this.news.concat(news);
       });
   }
 
   public onScrollUp(): void {
-    this.getNews(
-      this.currentPage,
-      (news) => {
+    this.getNews(this.currentPage)
+      .pipe(finalize(() => this.onFinalize()))
+      .subscribe((news) => {
+        this.currentPage++;
         this.news = news.concat(this.news);
       });
   }
 
   public onScrollDown(): void {
-    this.getNews(
-      this.currentPage,
-      (news) => {
+    this.getNews(this.currentPage)
+      .pipe(finalize(() => this.onFinalize()))
+      .subscribe((news) => {
+        this.currentPage++;
         this.news = this.news.concat(news);
       });
   }
 
-  private getNews(page: number = 1, saveResultsCallback: (news) => void) {
-    return this.http.get(`https://node-hnapi.herokuapp.com/news?page=${page}`).pipe(
-      skipWhile(() => this.httpReqestInProgress),
-      tap(() => { this.httpReqestInProgress = true; })
-    ).subscribe((news: any[]) => {
-        this.currentPage++;
-        saveResultsCallback(news);
-        this.httpReqestInProgress = false;
-      });
+  // Prevent duplicate requests on scroll.
+  // More: https://stackoverflow.com/a/50865911/6441494
+  private getNews(page: number = 1): Observable<any> {
+    if (this.request$) {
+      return this.request$;
+    } else {
+      console.log('Strona:', page);
+      this.request$ = this.http.get(`https://node-hnapi.herokuapp.com/news?page=${page}`).pipe(share());
+      return this.request$;
+    }
+  }
+
+  private onFinalize(): void {
+    this.request$ = null;
   }
 }
