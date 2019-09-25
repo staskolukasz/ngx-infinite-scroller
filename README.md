@@ -1,6 +1,6 @@
 # ngx-infinite-scroller
 
-Infinite and bidirectional scroll directive for Angular 7
+Infinite and bidirectional scroll directive for Angular 8
 
 All notable changes to this project are documented in [CHANGELOG.md](https://github.com/staskolukasz/ngx-infinite-scroller/blob/master/CHANGELOG.md) file.
 
