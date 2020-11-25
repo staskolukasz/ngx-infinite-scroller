@@ -6,8 +6,8 @@
     "module": "es2015",
     "types": []
   },
-  "exclude": [
-    "test.ts",
-    "**/*.spec.ts"
-  ]
+  "angularCompilerOptions": {
+    "enableIvy": false
+  },
+  "exclude": ["test.ts", "**/*.spec.ts"]
 }

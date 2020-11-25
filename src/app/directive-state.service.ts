@@ -1,5 +1,6 @@
-import { ElementRef } from '@angular/core';
+import { ElementRef, Injectable } from '@angular/core';
 
+@Injectable()
 export class DirectiveStateService {
 
   public get scrollTop(): number {
